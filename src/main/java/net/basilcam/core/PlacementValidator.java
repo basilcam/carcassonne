@@ -38,8 +38,8 @@ public enum PlacementValidator {
             }
         }
 
-        TileSection rightSection = tile.getRightSection();
         adjacentTile = board.getTile(xpos + 1, ypos);
+        TileSection rightSection = tile.getRightSection();
         if (adjacentTile.isPresent()) {
             TileSection adjacentSection = adjacentTile.get().getLeftSection();
             if (adjacentSection.getType() != rightSection.getType()) {

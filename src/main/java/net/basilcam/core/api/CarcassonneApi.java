@@ -1,6 +1,7 @@
 package net.basilcam.core.api;
 
 import net.basilcam.core.*;
+import net.basilcam.core.features.CompositeFeatureManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileStackFactory;
@@ -15,6 +16,7 @@ public class CarcassonneApi {
     private final List<CarcassonneHandler> handlers;
     private int currentPlayerIndex;
     private Stack<Tile> tileStack;
+    private CompositeFeatureManager featureManager;
 
     private GameState gameState;
 
@@ -27,6 +29,7 @@ public class CarcassonneApi {
         this.currentPlayerIndex = 0;
         this.tileStack = new Stack<>();
         this.gameState = GameState.SETUP;
+        this.featureManager = new CompositeFeatureManager(this.board);
     }
 
     public void newGame() {
@@ -35,6 +38,7 @@ public class CarcassonneApi {
         this.board.clear();
         this.tileStack = TileStackFactory.createTileStack();
         this.gameState = GameState.SETUP;
+        this.featureManager.clear();
     }
 
     public void register(CarcassonneHandler handler) {
@@ -108,6 +112,8 @@ public class CarcassonneApi {
             return;
         }
 
+        this.featureManager.updateFeatures(tile, xPosition, yPosition);
+
         scoreFeatures();
 
         this.handlers.forEach(handler -> handler.tilePlaced(tile, xPosition, yPosition));
@@ -126,6 +132,8 @@ public class CarcassonneApi {
     }
 
     private void scoreFeatures() {
+
+        // todo
 
         this.handlers.forEach(handler -> handler.scoreUpdate(null));
     }
