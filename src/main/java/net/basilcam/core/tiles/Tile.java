@@ -1,27 +1,104 @@
 package net.basilcam.core.tiles;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tile {
-    private static final int NUMBER_ROWS = 3;
-    private static final int NUMBER_COLUMNS = 3;
-    private TileSection[][] tileSections;
+    private TileSection topSection;
+    private TileSection leftSection;
+    private TileSection bottomSection;
+    private TileSection rightSection;
+    private final ImmutableList<TileSection> centerSections;
 
-    // [0][1] is top section
-    // [2][1] is bottom section
-    // [1][0] is left section
-    // [1][2] is right section
-
-    Tile(TileSection[][] tileSections) {
-        this.tileSections = tileSections;
+    private Tile(TileSection topSection,
+                TileSection leftSection,
+                TileSection bottomSection,
+                TileSection rightSection,
+                ImmutableList<TileSection> centerSections) {
+        this.topSection = topSection;
+        this.leftSection = leftSection;
+        this.bottomSection = bottomSection;
+        this.rightSection = rightSection;
+        this.centerSections = centerSections;
     }
 
-    public TileSection getSection(int x, int y) {
-        assert x >= 0 && x <= 2;
-        assert y >= 0 && y <= 2;
+    public TileSection getTopSection() {
+        return topSection;
+    }
 
-        return tileSections[x][y];
+    public TileSection getLeftSection() {
+        return leftSection;
+    }
+
+    public TileSection getBottomSection() {
+        return bottomSection;
+    }
+
+    public TileSection getRightSection() {
+        return rightSection;
+    }
+
+    public ImmutableList<TileSection> getCenterSections() {
+        return this.centerSections;
     }
 
     public void rotateClockwise() {
-        // todo
+        TileSection tempTop = this.topSection;
+        TileSection tempLeft = this.leftSection;
+        TileSection tempBottom = this.bottomSection;
+        TileSection tempRight = this.rightSection;
+
+        this.rightSection = tempTop;
+        this.bottomSection = tempRight;
+        this.leftSection = tempBottom;
+        this.topSection = tempLeft;
+    }
+
+    public static class Builder {
+        private TileSection topSection;
+        private TileSection leftSection;
+        private TileSection bottomSection;
+        private TileSection rightSection;
+        private final List<TileSection> centerSections;
+
+        Builder() {
+            this.centerSections = new ArrayList<>();
+        }
+
+        Builder withTop(TileSection section) {
+            this.topSection = section;
+            return this;
+        }
+
+        Builder withLeft(TileSection section) {
+            this.leftSection = section;
+            return this;
+        }
+
+        Builder withBottom(TileSection section) {
+            this.bottomSection = section;
+            return this;
+        }
+
+        Builder withRight(TileSection section) {
+            this.rightSection = section;
+            return this;
+        }
+
+        Builder addCenter(TileSection section) {
+            this.centerSections.add(section);
+            return this;
+        }
+
+        Tile build() {
+            return new Tile(this.topSection,
+                    this.leftSection,
+                    this.bottomSection,
+                    this.rightSection,
+                    ImmutableList.copyOf(this.centerSections));
+        }
+
     }
 }
