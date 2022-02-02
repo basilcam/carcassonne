@@ -1,4 +1,13 @@
 package net.basilcam.core.features;
 
-public class CityFeature implements Feature {
+import net.basilcam.core.tiles.TileSection;
+
+public class CityFeature extends GraphFeature {
+    public CityFeature(TileSection section) {
+        super(section);
+    }
+
+    public CityFeature() {
+        super();
+    }
 }

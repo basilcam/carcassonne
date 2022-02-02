@@ -16,9 +16,14 @@ when placing a tile in a given location, we need to validate its allowed
 when placing a tile, we need to add sections to existing features, or create new features
 - for roads + cities...
     - each feature is modelled as a graph
-    - for each section
+    - for each edge section
         - if there is an existing feature in the abutting tile, add the section to the feature
         - otherwise, create a new feature
+    - for each center section
+        - create a section node
+        - for each side section
+            - if the types are the same, connect the node
+            - if another node has already been connected, do a merge
     - merge any features connected through the center node
 
 when placing a tile, we need to determine if we've completed any features

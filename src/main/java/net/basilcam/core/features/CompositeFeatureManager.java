@@ -7,11 +7,9 @@ import net.basilcam.core.tiles.Tile;
 import java.util.List;
 
 public class CompositeFeatureManager implements FeatureManager {
-    private List<FeatureManager> featureManagers;
-    private Board board;
+    private final List<FeatureManager> featureManagers;
 
     public CompositeFeatureManager(Board board) {
-        this.board = board;
         this.featureManagers = Lists.newArrayList(
                 new CityFeatureManager(board),
                 new RoadFeatureManager(board),
@@ -30,6 +28,5 @@ public class CompositeFeatureManager implements FeatureManager {
         for (FeatureManager featureManager : featureManagers) {
             featureManager.clear();
         }
-
     }
 }

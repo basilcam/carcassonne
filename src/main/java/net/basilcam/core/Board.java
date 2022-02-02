@@ -17,6 +17,21 @@ public class Board {
         return Optional.ofNullable(tiles.get(x, y));
     }
 
+    public Optional<Tile> getTileRelativeTo(int x, int y, Direction direction) {
+        switch (direction) {
+            case UP:
+                return getTile(x, y + 1);
+            case LEFT:
+                return getTile(x - 1, y);
+            case DOWN:
+                return getTile(x, y - 1);
+            case RIGHT:
+                return getTile(x + 1, y);
+            default:
+                return Optional.empty();
+        }
+    }
+
     public void clear() {
         tiles.clear();
 

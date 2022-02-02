@@ -1,6 +1,7 @@
 package net.basilcam.core.tiles;
 
 import com.google.common.collect.ImmutableList;
+import net.basilcam.core.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,22 @@ public class Tile {
         this.bottomSection = bottomSection;
         this.rightSection = rightSection;
         this.centerSections = centerSections;
+    }
+
+    public TileSection getSection(Direction direction) {
+        switch (direction) {
+            case UP:
+                return getTopSection();
+            case LEFT:
+                return getLeftSection();
+            case DOWN:
+                return getBottomSection();
+            case RIGHT:
+                return getRightSection();
+            default:
+                throw new IllegalStateException();
+
+        }
     }
 
     public TileSection getTopSection() {

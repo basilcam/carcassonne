@@ -1,4 +1,13 @@
 package net.basilcam.core.features;
 
-public class RoadFeature implements Feature {
+import net.basilcam.core.tiles.TileSection;
+
+public class RoadFeature extends GraphFeature {
+    public RoadFeature(TileSection section) {
+        super(section);
+    }
+
+    public RoadFeature() {
+        super();
+    }
 }
