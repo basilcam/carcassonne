@@ -9,12 +9,14 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
 
 public enum TileStackFactory {
     ;
     public static final int MAX_TILE_ID = 24;
+    public static final int START_TILE_ID = 24;
 
     public static Stack<Tile> createTileStack() {
         JsonTileConfig.JsonTileStack jsonTileStack = readStackFromJson();
@@ -23,10 +25,28 @@ public enum TileStackFactory {
         return tileStack;
     }
 
+    public static Tile createStartTile() {
+        return new Tile.Builder(START_TILE_ID)
+                .withTop(new TileSection(TileSectionType.CITY))
+                .withLeft(new TileSection(TileSectionType.ROAD))
+                .withBottom(new TileSection(TileSectionType.FIELD))
+                .withRight(new TileSection(TileSectionType.ROAD))
+                .addCenter(new TileSection(TileSectionType.ROAD))
+                .build();
+    }
+
     @TestOnly
     public static Multimap<Integer, Tile> createTileMap() {
         JsonTileConfig.JsonTileStack jsonTileStack = readStackFromJson();
         return convertJsonToTileMap(jsonTileStack);
+    }
+
+    @TestOnly
+    public static Tile getTile(int id) {
+        Multimap<Integer, Tile> tileMap = createTileMap();
+        Optional<Tile> tile = tileMap.get(id).stream().findFirst();
+        assert tile.isPresent() : "tile does not exist with specified id " + id;
+        return tile.get();
     }
 
     private static JsonTileConfig.JsonTileStack readStackFromJson() {

@@ -9,10 +9,13 @@ public enum PlacementValidator {
 
     ;
 
-    public static boolean isValid(Board board, int xpos, int ypos, Tile tile) {
+    public static boolean isValid(Board board, int xPosition, int yPosition, Tile tile) {
+        if (board.getTile(xPosition, yPosition).isPresent()) {
+            return false;
+        }
 
         TileSection topSection = tile.getTopSection();
-        Optional<Tile> adjacentTile = board.getTile(xpos, ypos + 1);
+        Optional<Tile> adjacentTile = board.getTile(xPosition, yPosition + 1);
         if (adjacentTile.isPresent()) {
             TileSection adjacentSection = adjacentTile.get().getBottomSection();
             if (adjacentSection.getType() != topSection.getType()) {
@@ -21,7 +24,7 @@ public enum PlacementValidator {
         }
 
         TileSection leftSection = tile.getLeftSection();
-        adjacentTile = board.getTile(xpos - 1, ypos);
+        adjacentTile = board.getTile(xPosition - 1, yPosition);
         if (adjacentTile.isPresent()) {
             TileSection adjacentSection = adjacentTile.get().getRightSection();
             if (adjacentSection.getType() != leftSection.getType()) {
@@ -30,7 +33,7 @@ public enum PlacementValidator {
         }
 
         TileSection bottomSection = tile.getBottomSection();
-        adjacentTile = board.getTile(xpos, ypos - 1);
+        adjacentTile = board.getTile(xPosition, yPosition - 1);
         if (adjacentTile.isPresent()) {
             TileSection adjacentSection = adjacentTile.get().getTopSection();
             if (adjacentSection.getType() != bottomSection.getType()) {
@@ -38,7 +41,7 @@ public enum PlacementValidator {
             }
         }
 
-        adjacentTile = board.getTile(xpos + 1, ypos);
+        adjacentTile = board.getTile(xPosition + 1, yPosition);
         TileSection rightSection = tile.getRightSection();
         if (adjacentTile.isPresent()) {
             TileSection adjacentSection = adjacentTile.get().getLeftSection();
@@ -47,7 +50,9 @@ public enum PlacementValidator {
             }
         }
 
-        return false;
+        // todo: ensure abutting at least one other tile
+
+        return true;
     }
 
     public static boolean isValid(TileSection tileSection, Meeple meeple) {

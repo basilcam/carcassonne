@@ -3,6 +3,7 @@ package net.basilcam.core;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileStackFactory;
 
 import java.util.Optional;
 
@@ -15,7 +16,8 @@ public class Board {
     // right is +x
 
     public Board() {
-        tiles = HashBasedTable.create();
+        this.tiles = HashBasedTable.create();
+        this.tiles.put(0, 0, TileStackFactory.createStartTile());
     }
 
     public Optional<Tile> getTile(int xPosition, int yPosition) {
@@ -42,6 +44,6 @@ public class Board {
     }
 
     public void clear() {
-        tiles.clear();
+        this.tiles.clear();
     }
 }
