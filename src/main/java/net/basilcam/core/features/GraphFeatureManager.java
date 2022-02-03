@@ -36,7 +36,7 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
 
     private void updateFeaturesForEdges(Tile tile, int xPosition, int yPosition, Direction direction) {
         TileSection tileSection = tile.getSection(direction);
-        Optional<Tile> abuttingTile = this.board.getTileRelativeTo(xPosition, yPosition, direction);
+        Optional<Tile> abuttingTile = this.board.getAbuttingTile(xPosition, yPosition, direction);
         if (abuttingTile.isPresent()) {
             TileSection abuttingSection = abuttingTile.get().getSection(direction.oppositeDirection());
             assert abuttingSection.getType() != tileSection.getType() : "tile placement is invalid";

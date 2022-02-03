@@ -112,6 +112,8 @@ public class CarcassonneApi {
             return;
         }
 
+        this.board.placeTile(tile, xPosition, yPosition);
+
         this.featureManager.updateFeatures(tile, xPosition, yPosition);
 
         scoreFeatures();

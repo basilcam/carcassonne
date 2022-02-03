@@ -18,27 +18,30 @@ public class Board {
         tiles = HashBasedTable.create();
     }
 
-    public Optional<Tile> getTile(int x, int y) {
-        return Optional.ofNullable(tiles.get(x, y));
+    public Optional<Tile> getTile(int xPosition, int yPosition) {
+        return Optional.ofNullable(tiles.get(xPosition, yPosition));
     }
 
-    public Optional<Tile> getTileRelativeTo(int x, int y, Direction direction) {
+    public Optional<Tile> getAbuttingTile(int xPosition, int yPosition, Direction direction) {
         switch (direction) {
             case UP:
-                return getTile(x, y + 1);
+                return getTile(xPosition, yPosition + 1);
             case LEFT:
-                return getTile(x - 1, y);
+                return getTile(xPosition - 1, yPosition);
             case DOWN:
-                return getTile(x, y - 1);
+                return getTile(xPosition, yPosition - 1);
             case RIGHT:
-                return getTile(x + 1, y);
+                return getTile(xPosition + 1, yPosition);
             default:
                 return Optional.empty();
         }
     }
 
+    public void placeTile(Tile tile, int xPosition, int yPosition) {
+        this.tiles.put(xPosition, yPosition, tile);
+    }
+
     public void clear() {
         tiles.clear();
-
     }
 }
