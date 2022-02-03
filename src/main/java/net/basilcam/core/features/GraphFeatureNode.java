@@ -47,35 +47,7 @@ public class GraphFeatureNode {
     }
 
     public void closeNode(Direction direction) {
-        switch (direction) {
-            case UP:
-                setTopNode(CLOSED_NODE);
-                break;
-            case LEFT:
-                setLeftNode(CLOSED_NODE);
-                break;
-            case DOWN:
-                setBottomNode(CLOSED_NODE);
-                break;
-            case RIGHT:
-                setRightNode(CLOSED_NODE);
-                break;
-        }
-    }
-
-    public GraphFeatureNode getNode(Direction direction) {
-        switch (direction) {
-            case UP:
-                return this.topNode;
-            case LEFT:
-                return this.leftNode;
-            case DOWN:
-                return this.bottomNode;
-            case RIGHT:
-                return this.rightNode;
-            default:
-                return null;
-        }
+        connectNode(CLOSED_NODE, direction);
     }
 
     private void setTopNode(GraphFeatureNode node) {
