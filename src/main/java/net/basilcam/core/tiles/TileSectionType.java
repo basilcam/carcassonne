@@ -5,5 +5,5 @@ public enum TileSectionType {
     FIELD,
     MONASTERY,
     ROAD,
-    VILLAGE,
+    NONE
 }

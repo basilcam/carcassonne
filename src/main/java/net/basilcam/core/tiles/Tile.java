@@ -7,22 +7,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tile {
+    private final int id;
     private TileSection topSection;
     private TileSection leftSection;
     private TileSection bottomSection;
     private TileSection rightSection;
     private final ImmutableList<TileSection> centerSections;
 
-    private Tile(TileSection topSection,
-                TileSection leftSection,
-                TileSection bottomSection,
-                TileSection rightSection,
-                ImmutableList<TileSection> centerSections) {
+    private Tile(int id,
+                 TileSection topSection,
+                 TileSection leftSection,
+                 TileSection bottomSection,
+                 TileSection rightSection,
+                 ImmutableList<TileSection> centerSections) {
+        this.id = id;
         this.topSection = topSection;
         this.leftSection = leftSection;
         this.bottomSection = bottomSection;
         this.rightSection = rightSection;
         this.centerSections = centerSections;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public TileSection getSection(Direction direction) {
@@ -74,13 +81,15 @@ public class Tile {
     }
 
     public static class Builder {
+        private int id;
         private TileSection topSection;
         private TileSection leftSection;
         private TileSection bottomSection;
         private TileSection rightSection;
         private final List<TileSection> centerSections;
 
-        Builder() {
+        Builder(int id) {
+            this.id = id;
             this.centerSections = new ArrayList<>();
         }
 
@@ -110,7 +119,8 @@ public class Tile {
         }
 
         Tile build() {
-            return new Tile(this.topSection,
+            return new Tile(this.id,
+                    this.topSection,
                     this.leftSection,
                     this.bottomSection,
                     this.rightSection,
