@@ -1,6 +1,5 @@
 package net.basilcam.core.features;
 
-import net.basilcam.core.Direction;
 import net.basilcam.core.tiles.TileSection;
 
 import java.util.*;
@@ -19,25 +18,8 @@ public abstract class GraphFeature implements Feature {
         this.featureNodes = new HashMap<>();
     }
 
-    public void addCenterNode(GraphFeatureNode centerNode, TileSection existingSection, Direction directionFromExisting) {
-        GraphFeatureNode existingNode = this.featureNodes.get(existingSection);
-        featureNodes.put(centerNode.getTileSection(), centerNode);
-
-        existingNode.connectNode(centerNode, directionFromExisting);
-        centerNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
-    }
-
-    public void addAbuttingNode(TileSection newSection, TileSection existingSection, Direction directionFromExisting) {
-        GraphFeatureNode existingNode = this.featureNodes.get(existingSection); // todo: null check assertion
-        GraphFeatureNode newNode = new GraphFeatureNode(newSection);
-        featureNodes.put(newSection, newNode);
-
-        existingNode.connectNode(newNode, directionFromExisting);
-        newNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
-
-        for (Direction direction : directionFromExisting.perpendicularDirections()) {
-            newNode.closeNode(direction);
-        }
+    public void addNode(GraphFeatureNode node) {
+        this.featureNodes.put(node.getTileSection(), node);
     }
 
     public void merge(Collection<? extends GraphFeature> graphFeatures) {
@@ -48,5 +30,9 @@ public abstract class GraphFeature implements Feature {
 
     public Collection<TileSection> getTileSections() {
         return this.featureNodes.keySet();
+    }
+
+    public GraphFeatureNode getNode(TileSection tileSection) {
+        return this.featureNodes.get(tileSection);
     }
 }

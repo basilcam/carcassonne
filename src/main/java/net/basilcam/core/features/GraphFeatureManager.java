@@ -11,10 +11,6 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
     private final Board board;
     private final Map<TileSection, T> features;
 
-    // todo: refactor this. responsibility in constructing the graph is split between GraphFeatureManager and
-    //       GraphFeature. let's move it all here, since we need to potentially use the same center node to connect
-    //       to multiple adjacent nodes
-
     GraphFeatureManager(Board board) {
         this.board = board;
         this.features = new HashMap<>();
@@ -48,7 +44,7 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
             T abuttingFeature = this.features.get(abuttingSection);
             assert abuttingFeature != null : "no feature found for section";
 
-            abuttingFeature.addAbuttingNode(tileSection, abuttingSection, direction.oppositeDirection());
+            addAbuttingNode(abuttingFeature, tileSection, abuttingSection, direction.oppositeDirection());
             this.features.put(tileSection, abuttingFeature);
         } else {
             T feature = createFeature(tileSection);
@@ -71,7 +67,7 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
                 T feature = this.features.get(tileSection);
                 assert feature != null : "unexpected missing feature";
 
-                feature.addCenterNode(centerNode, tileSection, Direction.DOWN);
+                addCenterNode(feature, centerNode, tileSection, Direction.DOWN);
 
                 connectedFeatures.add(feature);
             }
@@ -91,5 +87,30 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
                 this.features.put(tileSection, mergedFeature);
             }
         }
+    }
+
+    public void addAbuttingNode(GraphFeature feature, TileSection newSection, TileSection existingSection, Direction directionFromExisting) {
+        GraphFeatureNode existingNode = feature.getNode(existingSection);
+        GraphFeatureNode newNode = new GraphFeatureNode(newSection);
+        feature.addNode(newNode);
+
+        existingNode.connectNode(newNode, directionFromExisting);
+        newNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
+
+        for (Direction direction : directionFromExisting.perpendicularDirections()) {
+            newNode.closeNode(direction);
+        }
+    }
+
+    public void addCenterNode(GraphFeature feature,
+                              GraphFeatureNode centerNode,
+                              TileSection existingSection,
+                              Direction directionFromExisting) {
+        GraphFeatureNode existingNode = feature.getNode(existingSection);
+
+        existingNode.connectNode(centerNode, directionFromExisting);
+        centerNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
+
+        feature.addNode(centerNode);
     }
 }
