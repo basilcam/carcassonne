@@ -9,14 +9,6 @@ public class GraphFeature implements Feature {
     private final Map<TileSection, GraphFeatureNode> featureNodes;
     private final TileSectionType type;
 
-    public GraphFeature(TileSection section) {
-        this.featureNodes = new HashMap<>();
-        this.type = section.getType();
-
-        GraphFeatureNode node = new GraphFeatureNode(section);
-        this.featureNodes.put(section, node);
-    }
-
     public GraphFeature(TileSectionType type) {
         this.featureNodes = new HashMap<>();
         this.type = type;
@@ -30,6 +22,11 @@ public class GraphFeature implements Feature {
             }
         }
         return true;
+    }
+
+    @Override
+    public TileSectionType getType() {
+        return this.type;
     }
 
     public void addNode(GraphFeatureNode node) {
@@ -48,5 +45,13 @@ public class GraphFeature implements Feature {
         for (GraphFeature feature : graphFeatures) {
             this.featureNodes.putAll(feature.featureNodes);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "GraphFeature{" +
+                "featureNodes=" + featureNodes +
+                ", type=" + type +
+                '}';
     }
 }

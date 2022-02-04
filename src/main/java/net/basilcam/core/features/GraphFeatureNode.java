@@ -58,30 +58,30 @@ public class GraphFeatureNode {
     }
 
     private void setTopNode(GraphFeatureNode node) {
-        if (this.topNode != OPEN_NODE) {
-            throw new IllegalStateException(EXISTING_EDGE_ERROR);
-        }
+//        if (this.topNode != OPEN_NODE) {
+//            throw new IllegalStateException(EXISTING_EDGE_ERROR);
+//        }
         this.topNode = node;
     }
 
     private void setLeftNode(GraphFeatureNode node) {
-        if (this.leftNode != OPEN_NODE) {
-            throw new IllegalStateException(EXISTING_EDGE_ERROR);
-        }
+//        if (this.leftNode != OPEN_NODE) {
+//            throw new IllegalStateException(EXISTING_EDGE_ERROR);
+//        }
         this.leftNode = node;
     }
 
     public void setBottomNode(GraphFeatureNode node) {
-        if (this.bottomNode != OPEN_NODE) {
-            throw new IllegalStateException(EXISTING_EDGE_ERROR);
-        }
+//        if (this.bottomNode != OPEN_NODE) {
+//            throw new IllegalStateException(EXISTING_EDGE_ERROR);
+//        }
         this.bottomNode = node;
     }
 
     public void setRightNode(GraphFeatureNode node) {
-        if (this.rightNode != OPEN_NODE) {
-            throw new IllegalStateException(EXISTING_EDGE_ERROR);
-        }
+//        if (this.rightNode != OPEN_NODE) {
+//            throw new IllegalStateException(EXISTING_EDGE_ERROR);
+//        }
         this.rightNode = node;
     }
 }

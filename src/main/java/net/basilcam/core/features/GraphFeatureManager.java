@@ -21,6 +21,7 @@ public class GraphFeatureManager implements FeatureManager {
         this.tileSectionToFeature = new HashMap<>();
 
         // todo: i don't like this explicity replies on start tile location / existence
+
         Optional<Tile> startTile = this.board.getTile(0, 0);
         assert startTile.isPresent();
         updateFeatures(startTile.get(), 0, 0);
@@ -55,15 +56,22 @@ public class GraphFeatureManager implements FeatureManager {
         Optional<Tile> abuttingTile = this.board.getAbuttingTile(xPosition, yPosition, direction);
         if (abuttingTile.isPresent()) {
             TileSection abuttingSection = abuttingTile.get().getSection(direction.oppositeDirection());
-            assert abuttingSection.getType() != tileSection.getType() : "tile placement is invalid";
+            assert abuttingSection.getType() == tileSection.getType() : "tile placement is invalid";
 
             GraphFeature abuttingFeature = this.tileSectionToFeature.get(abuttingSection);
             assert abuttingFeature != null : "no feature found for section";
 
-            addAbuttingNode(abuttingFeature, tileSection, abuttingSection, direction.oppositeDirection());
+            connectAbuttingNode(abuttingFeature, tileSection, abuttingSection, direction.oppositeDirection());
             this.tileSectionToFeature.put(tileSection, abuttingFeature);
         } else {
-            GraphFeature feature = new GraphFeature(tileSection);
+            GraphFeature feature = new GraphFeature(tileSection.getType());
+            GraphFeatureNode node = new GraphFeatureNode(tileSection);
+            for (Direction closedDirections : direction.perpendicularDirections()) {
+                node.closeNode(closedDirections);
+            }
+            node.closeNode(direction.oppositeDirection());
+            feature.addNode(node);
+
             this.tileSectionToFeature.put(tileSection, feature);
         }
     }
@@ -74,22 +82,23 @@ public class GraphFeatureManager implements FeatureManager {
 
             if (!isSupportedFeatureType(centerSection.getType())) {
                 continue;
+                // todo: need to close node
             }
 
             List<GraphFeature> connectedFeatures = new ArrayList<>();
             for (Direction direction : Direction.values()) {
-                TileSection tileSection = tile.getSection(direction);
-                if (tileSection.getType() != centerSection.getType()) {
+                TileSection adjacentTileSection = tile.getSection(direction);
+                if (adjacentTileSection.getType() != centerSection.getType()) {
                     centerNode.closeNode(direction);
                     continue;
                 }
 
-                GraphFeature feature = this.tileSectionToFeature.get(tileSection);
-                assert feature != null : "unexpected missing feature";
+                GraphFeature adjacentFeature = this.tileSectionToFeature.get(adjacentTileSection);
+                assert adjacentFeature != null : "unexpected missing feature";
 
-                addCenterNode(feature, centerNode, tileSection, direction.oppositeDirection());
+                connectCenterNode(adjacentFeature, centerNode, adjacentTileSection, direction.oppositeDirection());
 
-                connectedFeatures.add(feature);
+                connectedFeatures.add(adjacentFeature);
             }
 
             if (connectedFeatures.size() == 0) {
@@ -109,10 +118,10 @@ public class GraphFeatureManager implements FeatureManager {
         }
     }
 
-    private void addAbuttingNode(GraphFeature feature,
-                                 TileSection newSection,
-                                 TileSection existingSection,
-                                 Direction directionFromExisting) {
+    private void connectAbuttingNode(GraphFeature feature,
+                                     TileSection newSection,
+                                     TileSection existingSection,
+                                     Direction directionFromExisting) {
         GraphFeatureNode existingNode = feature.getNode(existingSection);
         GraphFeatureNode newNode = new GraphFeatureNode(newSection);
         feature.addNode(newNode);
@@ -123,13 +132,19 @@ public class GraphFeatureManager implements FeatureManager {
         for (Direction direction : directionFromExisting.perpendicularDirections()) {
             newNode.closeNode(direction);
         }
+
+        // close node to center. may be opened in updateFeaturesForCenter
+        // todo: have third uninitialized state. i don't like this is temporarily set to closed
+        newNode.closeNode(directionFromExisting);
     }
 
-    private void addCenterNode(GraphFeature feature,
-                               GraphFeatureNode centerNode,
-                               TileSection existingSection,
-                               Direction directionFromExisting) {
+    private void connectCenterNode(GraphFeature feature,
+                                   GraphFeatureNode centerNode,
+                                   TileSection existingSection,
+                                   Direction directionFromExisting) {
         GraphFeatureNode existingNode = feature.getNode(existingSection);
+
+        assert existingNode != null : "unexpected null node";
 
         existingNode.connectNode(centerNode, directionFromExisting);
         centerNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
