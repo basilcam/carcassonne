@@ -4,12 +4,17 @@ import net.basilcam.core.Board;
 import net.basilcam.core.Direction;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
+import net.basilcam.core.tiles.TileSectionType;
 
 import java.util.*;
 
 public abstract class GraphFeatureManager<T extends GraphFeature> implements FeatureManager {
     private final Board board;
     private final Map<TileSection, T> tileSectionToFeature;
+
+    // todo: consider refactoring this so we pass in TileSections rather than Tiles
+    // todo: that way we can rely on generics instead of casing on TileSection types
+    // todo: we're currently diverging from OOP dev too much
 
     GraphFeatureManager(Board board) {
         this.board = board;
@@ -35,6 +40,7 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
         this.tileSectionToFeature.clear();
     }
 
+    @Override
     public Collection<T> getFeatures() {
         return Set.copyOf(this.tileSectionToFeature.values());
     }
@@ -43,8 +49,16 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
 
     public abstract T createEmptyFeature();
 
+    public abstract TileSectionType getTileSectionType();
+
     private void updateFeaturesForEdges(Tile tile, int xPosition, int yPosition, Direction direction) {
         TileSection tileSection = tile.getSection(direction);
+
+        if (tileSection.getType() != getTileSectionType()) {
+            return;
+            // todo: refactor, i really don't like this
+        }
+
         Optional<Tile> abuttingTile = this.board.getAbuttingTile(xPosition, yPosition, direction);
         if (abuttingTile.isPresent()) {
             TileSection abuttingSection = abuttingTile.get().getSection(direction.oppositeDirection());
@@ -64,6 +78,11 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
     private void updateFeaturesForCenter(Tile tile) {
         for (TileSection centerSection : tile.getCenterSections()) {
             GraphFeatureNode centerNode = new GraphFeatureNode(centerSection);
+
+            if (centerSection.getType() != getTileSectionType()) {
+                continue;
+                // todo: refactor, i really don't like this
+            }
 
             List<T> connectedFeatures = new ArrayList<>();
             for (Direction direction : Direction.values()) {

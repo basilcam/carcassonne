@@ -18,24 +18,6 @@ public abstract class GraphFeature implements Feature {
         this.featureNodes = new HashMap<>();
     }
 
-    public void addNode(GraphFeatureNode node) {
-        this.featureNodes.put(node.getTileSection(), node);
-    }
-
-    public void merge(Collection<? extends GraphFeature> graphFeatures) {
-        for (GraphFeature feature : graphFeatures) {
-            this.featureNodes.putAll(feature.featureNodes);
-        }
-    }
-
-    public Collection<TileSection> getTileSections() {
-        return this.featureNodes.keySet();
-    }
-
-    public GraphFeatureNode getNode(TileSection tileSection) {
-        return this.featureNodes.get(tileSection);
-    }
-
     @Override
     public boolean isComplete() {
         for (GraphFeatureNode node : this.featureNodes.values()) {
@@ -44,5 +26,23 @@ public abstract class GraphFeature implements Feature {
             }
         }
         return true;
+    }
+
+    public void addNode(GraphFeatureNode node) {
+        this.featureNodes.put(node.getTileSection(), node);
+    }
+
+    public GraphFeatureNode getNode(TileSection tileSection) {
+        return this.featureNodes.get(tileSection);
+    }
+
+    public Collection<TileSection> getTileSections() {
+        return this.featureNodes.keySet();
+    }
+
+    public void merge(Collection<? extends GraphFeature> graphFeatures) {
+        for (GraphFeature feature : graphFeatures) {
+            this.featureNodes.putAll(feature.featureNodes);
+        }
     }
 }

@@ -3,6 +3,9 @@ package net.basilcam.core.features;
 import net.basilcam.core.Board;
 import net.basilcam.core.tiles.Tile;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class MonasteryFeatureManager implements FeatureManager {
     private final Board board;
 
@@ -16,5 +19,10 @@ public class MonasteryFeatureManager implements FeatureManager {
 
     @Override
     public void clear() {
+    }
+
+    @Override
+    public Collection<? extends Feature> getFeatures() {
+        return Collections.emptyList();
     }
 }
