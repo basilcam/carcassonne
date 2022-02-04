@@ -29,6 +29,13 @@ public class GraphFeatureNode {
         return this.tileSection;
     }
 
+    public boolean hasOpenConnection() {
+        return this.topNode == OPEN_NODE
+                || this.leftNode == OPEN_NODE
+                || this.bottomNode == OPEN_NODE
+                || this.rightNode == OPEN_NODE;
+    }
+
     public void connectNode(GraphFeatureNode node, Direction directionFromExisting) {
         switch (directionFromExisting) {
             case UP:

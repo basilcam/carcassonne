@@ -35,4 +35,14 @@ public abstract class GraphFeature implements Feature {
     public GraphFeatureNode getNode(TileSection tileSection) {
         return this.featureNodes.get(tileSection);
     }
+
+    @Override
+    public boolean isComplete() {
+        for (GraphFeatureNode node : this.featureNodes.values()) {
+            if (node.hasOpenConnection()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

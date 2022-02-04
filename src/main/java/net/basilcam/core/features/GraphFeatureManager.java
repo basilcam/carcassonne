@@ -9,11 +9,16 @@ import java.util.*;
 
 public abstract class GraphFeatureManager<T extends GraphFeature> implements FeatureManager {
     private final Board board;
-    private final Map<TileSection, T> features;
+    private final Map<TileSection, T> tileSectionToFeature;
 
     GraphFeatureManager(Board board) {
         this.board = board;
-        this.features = new HashMap<>();
+        this.tileSectionToFeature = new HashMap<>();
+
+        // todo: i don't like this explicity replies on start tile location / existence
+        Optional<Tile> startTile = this.board.getTile(0, 0);
+        assert startTile.isPresent();
+        updateFeatures(startTile.get(), 0, 0);
     }
 
     @Override
@@ -27,7 +32,11 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
 
     @Override
     public void clear() {
-        this.features.clear();
+        this.tileSectionToFeature.clear();
+    }
+
+    public Collection<T> getFeatures() {
+        return Set.copyOf(this.tileSectionToFeature.values());
     }
 
     public abstract T createFeature(TileSection tileSection);
@@ -41,14 +50,14 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
             TileSection abuttingSection = abuttingTile.get().getSection(direction.oppositeDirection());
             assert abuttingSection.getType() != tileSection.getType() : "tile placement is invalid";
 
-            T abuttingFeature = this.features.get(abuttingSection);
+            T abuttingFeature = this.tileSectionToFeature.get(abuttingSection);
             assert abuttingFeature != null : "no feature found for section";
 
             addAbuttingNode(abuttingFeature, tileSection, abuttingSection, direction.oppositeDirection());
-            this.features.put(tileSection, abuttingFeature);
+            this.tileSectionToFeature.put(tileSection, abuttingFeature);
         } else {
             T feature = createFeature(tileSection);
-            this.features.put(tileSection, feature);
+            this.tileSectionToFeature.put(tileSection, feature);
         }
     }
 
@@ -64,10 +73,10 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
                     continue;
                 }
 
-                T feature = this.features.get(tileSection);
+                T feature = this.tileSectionToFeature.get(tileSection);
                 assert feature != null : "unexpected missing feature";
 
-                addCenterNode(feature, centerNode, tileSection, Direction.DOWN);
+                addCenterNode(feature, centerNode, tileSection, direction.oppositeDirection());
 
                 connectedFeatures.add(feature);
             }
@@ -77,19 +86,22 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
             }
 
             if (connectedFeatures.size() == 1) {
-                this.features.put(centerSection, connectedFeatures.get(0));
+                this.tileSectionToFeature.put(centerSection, connectedFeatures.get(0));
                 continue;
             }
 
             T mergedFeature = createEmptyFeature();
             mergedFeature.merge(connectedFeatures);
             for (TileSection tileSection : mergedFeature.getTileSections()) {
-                this.features.put(tileSection, mergedFeature);
+                this.tileSectionToFeature.put(tileSection, mergedFeature);
             }
         }
     }
 
-    public void addAbuttingNode(GraphFeature feature, TileSection newSection, TileSection existingSection, Direction directionFromExisting) {
+    private void addAbuttingNode(GraphFeature feature,
+                                 TileSection newSection,
+                                 TileSection existingSection,
+                                 Direction directionFromExisting) {
         GraphFeatureNode existingNode = feature.getNode(existingSection);
         GraphFeatureNode newNode = new GraphFeatureNode(newSection);
         feature.addNode(newNode);
@@ -102,10 +114,10 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
         }
     }
 
-    public void addCenterNode(GraphFeature feature,
-                              GraphFeatureNode centerNode,
-                              TileSection existingSection,
-                              Direction directionFromExisting) {
+    private void addCenterNode(GraphFeature feature,
+                               GraphFeatureNode centerNode,
+                               TileSection existingSection,
+                               Direction directionFromExisting) {
         GraphFeatureNode existingNode = feature.getNode(existingSection);
 
         existingNode.connectNode(centerNode, directionFromExisting);
