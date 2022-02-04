@@ -12,16 +12,11 @@ public class GraphFeatureManager implements FeatureManager {
     private final Board board;
     private final Map<TileSection, GraphFeature> tileSectionToFeature;
 
-    // todo: consider refactoring this so we pass in TileSections rather than Tiles
-    // todo: that way we can rely on generics instead of casing on TileSection types
-    // todo: we're currently diverging from OOP dev too much
-
     GraphFeatureManager(Board board) {
         this.board = board;
         this.tileSectionToFeature = new HashMap<>();
 
         // todo: i don't like this explicity replies on start tile location / existence
-
         Optional<Tile> startTile = this.board.getTile(0, 0);
         assert startTile.isPresent();
         updateFeatures(startTile.get(), 0, 0);
@@ -57,9 +52,6 @@ public class GraphFeatureManager implements FeatureManager {
         for (Direction closedDirections : direction.perpendicularDirections()) {
             newNode.closeNode(closedDirections);
         }
-        // todo: i close the node facing the center now. and potentially override it later
-        // todo: i don't like this, should close it at the end if nothing connects. but that's a lil messy
-        newNode.closeNode(direction.oppositeDirection());
 
         Optional<Tile> abuttingTile = this.board.getAbuttingTile(xPosition, yPosition, direction);
         if (abuttingTile.isPresent()) {
@@ -115,6 +107,18 @@ public class GraphFeatureManager implements FeatureManager {
             mergedFeature.merge(connectedFeatures);
             for (TileSection tileSection : mergedFeature.getTileSections()) {
                 this.tileSectionToFeature.put(tileSection, mergedFeature);
+            }
+        }
+
+        for (Direction direction : Direction.values()) {
+            TileSection tileSection = tile.getSection(direction);
+            GraphFeature feature = this.tileSectionToFeature.get(tileSection);
+            if (feature == null) {
+                continue;
+            }
+            GraphFeatureNode node = feature.getNode(tileSection);
+            if (node.getNode(direction.oppositeDirection()) == GraphFeatureNode.OPEN_NODE) {
+                node.closeNode(direction.oppositeDirection());
             }
         }
     }

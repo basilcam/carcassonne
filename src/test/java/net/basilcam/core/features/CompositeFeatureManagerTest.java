@@ -30,8 +30,15 @@ class CompositeFeatureManagerTest {
 
         assertThat(features).hasSize(2); // city, road
         assertThat(features).allMatch(feature -> !feature.isComplete());
-        assertThat(features.stream().map(Feature::getType).collect(Collectors.toList()))
-                .containsExactlyInAnyOrder(TileSectionType.CITY, TileSectionType.ROAD);
+
+        assertThat(features).areExactly(1, new Condition<>(
+                feature -> feature.getType() == TileSectionType.CITY
+                        && !feature.isComplete(),
+                "city"));
+        assertThat(features).areExactly(1, new Condition<>(
+                feature -> feature.getType() == TileSectionType.ROAD
+                        && !feature.isComplete(),
+                "road"));
     }
 
     @Test

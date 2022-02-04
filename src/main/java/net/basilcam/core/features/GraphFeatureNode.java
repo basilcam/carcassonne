@@ -29,6 +29,21 @@ public class GraphFeatureNode {
         return this.tileSection;
     }
 
+    public GraphFeatureNode getNode(Direction direction) {
+        switch (direction) {
+            case UP:
+                return this.topNode;
+            case LEFT:
+                return this.leftNode;
+            case DOWN:
+                return this.bottomNode;
+            case RIGHT:
+                return this.rightNode;
+            default:
+                throw new RuntimeException();
+        }
+    }
+
     public boolean hasOpenConnection() {
         return this.topNode == OPEN_NODE
                 || this.leftNode == OPEN_NODE
@@ -71,17 +86,18 @@ public class GraphFeatureNode {
         this.leftNode = node;
     }
 
-    public void setBottomNode(GraphFeatureNode node) {
+    private void setBottomNode(GraphFeatureNode node) {
 //        if (this.bottomNode != OPEN_NODE) {
 //            throw new IllegalStateException(EXISTING_EDGE_ERROR);
 //        }
         this.bottomNode = node;
     }
 
-    public void setRightNode(GraphFeatureNode node) {
+    private void setRightNode(GraphFeatureNode node) {
 //        if (this.rightNode != OPEN_NODE) {
 //            throw new IllegalStateException(EXISTING_EDGE_ERROR);
 //        }
         this.rightNode = node;
     }
+
 }
