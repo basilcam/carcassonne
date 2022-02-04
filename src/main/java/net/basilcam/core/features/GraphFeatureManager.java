@@ -53,6 +53,14 @@ public class GraphFeatureManager implements FeatureManager {
             return;
         }
 
+        GraphFeatureNode newNode = new GraphFeatureNode(tileSection);
+        for (Direction closedDirections : direction.perpendicularDirections()) {
+            newNode.closeNode(closedDirections);
+        }
+        // todo: i close the node facing the center now. and potentially override it later
+        // todo: i don't like this, should close it at the end if nothing connects. but that's a lil messy
+        newNode.closeNode(direction.oppositeDirection());
+
         Optional<Tile> abuttingTile = this.board.getAbuttingTile(xPosition, yPosition, direction);
         if (abuttingTile.isPresent()) {
             TileSection abuttingSection = abuttingTile.get().getSection(direction.oppositeDirection());
@@ -61,17 +69,11 @@ public class GraphFeatureManager implements FeatureManager {
             GraphFeature abuttingFeature = this.tileSectionToFeature.get(abuttingSection);
             assert abuttingFeature != null : "no feature found for section";
 
-            connectAbuttingNode(abuttingFeature, tileSection, abuttingSection, direction.oppositeDirection());
+            connectAbuttingNode(abuttingFeature, newNode, abuttingSection, direction.oppositeDirection());
             this.tileSectionToFeature.put(tileSection, abuttingFeature);
         } else {
             GraphFeature feature = new GraphFeature(tileSection.getType());
-            GraphFeatureNode node = new GraphFeatureNode(tileSection);
-            for (Direction closedDirections : direction.perpendicularDirections()) {
-                node.closeNode(closedDirections);
-            }
-            node.closeNode(direction.oppositeDirection());
-            feature.addNode(node);
-
+            feature.addNode(newNode);
             this.tileSectionToFeature.put(tileSection, feature);
         }
     }
@@ -82,7 +84,6 @@ public class GraphFeatureManager implements FeatureManager {
 
             if (!isSupportedFeatureType(centerSection.getType())) {
                 continue;
-                // todo: need to close node
             }
 
             List<GraphFeature> connectedFeatures = new ArrayList<>();
@@ -119,23 +120,14 @@ public class GraphFeatureManager implements FeatureManager {
     }
 
     private void connectAbuttingNode(GraphFeature feature,
-                                     TileSection newSection,
+                                     GraphFeatureNode newNode,
                                      TileSection existingSection,
                                      Direction directionFromExisting) {
         GraphFeatureNode existingNode = feature.getNode(existingSection);
-        GraphFeatureNode newNode = new GraphFeatureNode(newSection);
         feature.addNode(newNode);
 
         existingNode.connectNode(newNode, directionFromExisting);
         newNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
-
-        for (Direction direction : directionFromExisting.perpendicularDirections()) {
-            newNode.closeNode(direction);
-        }
-
-        // close node to center. may be opened in updateFeaturesForCenter
-        // todo: have third uninitialized state. i don't like this is temporarily set to closed
-        newNode.closeNode(directionFromExisting);
     }
 
     private void connectCenterNode(GraphFeature feature,
