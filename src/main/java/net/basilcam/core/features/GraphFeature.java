@@ -1,21 +1,25 @@
 package net.basilcam.core.features;
 
 import net.basilcam.core.tiles.TileSection;
+import net.basilcam.core.tiles.TileSectionType;
 
 import java.util.*;
 
-public abstract class GraphFeature implements Feature {
+public class GraphFeature implements Feature {
     private final Map<TileSection, GraphFeatureNode> featureNodes;
+    private final TileSectionType type;
 
     public GraphFeature(TileSection section) {
         this.featureNodes = new HashMap<>();
+        this.type = section.getType();
 
         GraphFeatureNode node = new GraphFeatureNode(section);
         this.featureNodes.put(section, node);
     }
 
-    public GraphFeature() {
+    public GraphFeature(TileSectionType type) {
         this.featureNodes = new HashMap<>();
+        this.type = type;
     }
 
     @Override

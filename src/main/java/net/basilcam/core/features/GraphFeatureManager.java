@@ -8,9 +8,9 @@ import net.basilcam.core.tiles.TileSectionType;
 
 import java.util.*;
 
-public abstract class GraphFeatureManager<T extends GraphFeature> implements FeatureManager {
+public class GraphFeatureManager implements FeatureManager {
     private final Board board;
-    private final Map<TileSection, T> tileSectionToFeature;
+    private final Map<TileSection, GraphFeature> tileSectionToFeature;
 
     // todo: consider refactoring this so we pass in TileSections rather than Tiles
     // todo: that way we can rely on generics instead of casing on TileSection types
@@ -41,22 +41,15 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
     }
 
     @Override
-    public Collection<T> getFeatures() {
+    public Collection<GraphFeature> getFeatures() {
         return Set.copyOf(this.tileSectionToFeature.values());
     }
-
-    public abstract T createFeature(TileSection tileSection);
-
-    public abstract T createEmptyFeature();
-
-    public abstract TileSectionType getTileSectionType();
 
     private void updateFeaturesForEdges(Tile tile, int xPosition, int yPosition, Direction direction) {
         TileSection tileSection = tile.getSection(direction);
 
-        if (tileSection.getType() != getTileSectionType()) {
+        if (!isSupportedFeatureType(tileSection.getType())) {
             return;
-            // todo: refactor, i really don't like this
         }
 
         Optional<Tile> abuttingTile = this.board.getAbuttingTile(xPosition, yPosition, direction);
@@ -64,13 +57,13 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
             TileSection abuttingSection = abuttingTile.get().getSection(direction.oppositeDirection());
             assert abuttingSection.getType() != tileSection.getType() : "tile placement is invalid";
 
-            T abuttingFeature = this.tileSectionToFeature.get(abuttingSection);
+            GraphFeature abuttingFeature = this.tileSectionToFeature.get(abuttingSection);
             assert abuttingFeature != null : "no feature found for section";
 
             addAbuttingNode(abuttingFeature, tileSection, abuttingSection, direction.oppositeDirection());
             this.tileSectionToFeature.put(tileSection, abuttingFeature);
         } else {
-            T feature = createFeature(tileSection);
+            GraphFeature feature = new GraphFeature(tileSection);
             this.tileSectionToFeature.put(tileSection, feature);
         }
     }
@@ -79,12 +72,11 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
         for (TileSection centerSection : tile.getCenterSections()) {
             GraphFeatureNode centerNode = new GraphFeatureNode(centerSection);
 
-            if (centerSection.getType() != getTileSectionType()) {
+            if (!isSupportedFeatureType(centerSection.getType())) {
                 continue;
-                // todo: refactor, i really don't like this
             }
 
-            List<T> connectedFeatures = new ArrayList<>();
+            List<GraphFeature> connectedFeatures = new ArrayList<>();
             for (Direction direction : Direction.values()) {
                 TileSection tileSection = tile.getSection(direction);
                 if (tileSection.getType() != centerSection.getType()) {
@@ -92,7 +84,7 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
                     continue;
                 }
 
-                T feature = this.tileSectionToFeature.get(tileSection);
+                GraphFeature feature = this.tileSectionToFeature.get(tileSection);
                 assert feature != null : "unexpected missing feature";
 
                 addCenterNode(feature, centerNode, tileSection, direction.oppositeDirection());
@@ -109,7 +101,7 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
                 continue;
             }
 
-            T mergedFeature = createEmptyFeature();
+            GraphFeature mergedFeature = new GraphFeature(centerSection.getType());
             mergedFeature.merge(connectedFeatures);
             for (TileSection tileSection : mergedFeature.getTileSections()) {
                 this.tileSectionToFeature.put(tileSection, mergedFeature);
@@ -143,5 +135,10 @@ public abstract class GraphFeatureManager<T extends GraphFeature> implements Fea
         centerNode.connectNode(existingNode, directionFromExisting.oppositeDirection());
 
         feature.addNode(centerNode);
+    }
+
+    private boolean isSupportedFeatureType(TileSectionType type) {
+        return type == TileSectionType.CITY
+                || type == TileSectionType.ROAD;
     }
 }

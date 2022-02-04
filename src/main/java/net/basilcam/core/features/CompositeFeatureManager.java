@@ -13,8 +13,7 @@ public class CompositeFeatureManager implements FeatureManager {
 
     public CompositeFeatureManager(Board board) {
         this.featureManagers = Lists.newArrayList(
-                new CityFeatureManager(board),
-                new RoadFeatureManager(board),
+                new GraphFeatureManager(board),
                 new MonasteryFeatureManager(board));
     }
 
@@ -33,7 +32,7 @@ public class CompositeFeatureManager implements FeatureManager {
     }
 
     @Override
-    public Collection<? extends Feature> getFeatures() { // todo: should i be using wild cards
+    public Collection<? extends Feature> getFeatures() {
         List<Feature> features = new ArrayList<>();
         for (FeatureManager featureManager : featureManagers) {
             features.addAll(featureManager.getFeatures());

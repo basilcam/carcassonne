@@ -3,15 +3,13 @@ package net.basilcam.core.features;
 import net.basilcam.core.Board;
 import org.junit.jupiter.api.BeforeEach;
 
-public abstract class GraphFeatureManagerTest<T extends GraphFeature> {
+public class GraphFeatureManagerTest {
     private Board board;
-    private GraphFeatureManager<T> featureManager;
+    private GraphFeatureManager featureManager;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.featureManager = createFeatureManager(this.board);
+        this.featureManager = new GraphFeatureManager(this.board);
     }
-
-    public abstract GraphFeatureManager<T> createFeatureManager(Board board);
 }
