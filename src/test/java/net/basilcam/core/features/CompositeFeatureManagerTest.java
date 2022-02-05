@@ -42,7 +42,7 @@ class CompositeFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_tilePlacedAboveStartTile() {
-        Tile tile = TileStackFactory.getTile(20);
+        Tile tile = TileStackFactory.getTileById(20);
         tile.rotateClockwise();
         tile.rotateClockwise();
 
@@ -64,11 +64,11 @@ class CompositeFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_tilePlacedBesideTwoTiles() {
-        Tile tile15 = TileStackFactory.getTile(15);
-        Tile tile11 = TileStackFactory.getTile(11);
+        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile11 = TileStackFactory.getTileById(11);
         tile11.rotateClockwise();
         tile11.rotateClockwise();
-        Tile tile20 = TileStackFactory.getTile(20);
+        Tile tile20 = TileStackFactory.getTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         tile20.rotateClockwise();
@@ -115,14 +115,14 @@ class CompositeFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_circleRoad() {
-        Tile tile15 = TileStackFactory.getTile(15);
-        Tile tile2 = TileStackFactory.getTile(2);
-        Tile tile10 = TileStackFactory.getTile(10);
+        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile2 = TileStackFactory.getTileById(2);
+        Tile tile10 = TileStackFactory.getTileById(10);
         tile10.rotateClockwise();
-        Tile tile7 = TileStackFactory.getTile(7);
+        Tile tile7 = TileStackFactory.getTileById(7);
         tile7.rotateClockwise();
         tile7.rotateClockwise();
-        Tile tile14 = TileStackFactory.getTile(14);
+        Tile tile14 = TileStackFactory.getTileById(14);
 
         placeTileAndUpdate(tile15, 1, 0);
         placeTileAndUpdate(tile2, 1, -1);

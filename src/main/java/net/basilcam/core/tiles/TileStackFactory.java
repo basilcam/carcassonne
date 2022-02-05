@@ -42,7 +42,7 @@ public enum TileStackFactory {
     }
 
     @TestOnly
-    public static Tile getTile(int id) {
+    public static Tile getTileById(int id) {
         Multimap<Integer, Tile> tileMap = createTileMap();
         Optional<Tile> tile = tileMap.get(id).stream().findFirst();
         assert tile.isPresent() : "tile does not exist with specified id " + id;

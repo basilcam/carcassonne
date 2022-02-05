@@ -17,80 +17,80 @@ class PlacementValidatorTest {
 
     @Test
     public void invalidTilePlacement_placedOnExistingTile() {
-        Tile tile = TileStackFactory.getTile(24);
+        Tile tile = TileStackFactory.getTileById(24);
 
         assertThat(isValid(tile, 0, 0)).isFalse();
     }
 
     @Test
     public void invalidTilePlacement_mismatchingSections_placedAboveExistingTile() {
-        Tile tile = TileStackFactory.getTile(2);
+        Tile tile = TileStackFactory.getTileById(2);
 
         assertThat(isValid(tile, 0, 1)).isFalse();
     }
 
     @Test
     public void invalidTilePlacement_mismatchingSections_placedLeftOfExistingTile() {
-        Tile tile = TileStackFactory.getTile(22);
+        Tile tile = TileStackFactory.getTileById(22);
 
         assertThat(isValid(tile, -1, 0)).isFalse();
     }
 
     @Test
     public void invalidTilePlacement_mismatchingSections_placedBelowExistingTile() {
-        Tile tile = TileStackFactory.getTile(14);
+        Tile tile = TileStackFactory.getTileById(14);
 
         assertThat(isValid(tile, 0, -1)).isFalse();
     }
 
     @Test
     public void invalidTilePlacement_mismatchingSections_placedRightOfExistingTile() {
-        Tile tile = TileStackFactory.getTile(14);
+        Tile tile = TileStackFactory.getTileById(14);
 
         assertThat(isValid(tile, 1, 0)).isFalse();
     }
 
     @Test
     public void validTilePlacement_matchingSections_placedAboveExistingTile() {
-        Tile tile = TileStackFactory.getTile(1);
+        Tile tile = TileStackFactory.getTileById(1);
 
         assertThat(isValid(tile, 0, 1)).isTrue();
     }
 
     @Test
     public void validTilePlacement_matchingSections_placedLeftOfExistingTile() {
-        Tile tile = TileStackFactory.getTile(2);
+        Tile tile = TileStackFactory.getTileById(2);
 
         assertThat(isValid(tile, -1, 0)).isTrue();
     }
 
     @Test
     public void validTilePlacement_matchingSections_placedBelowExistingTile() {
-        Tile tile = TileStackFactory.getTile(15);
+        Tile tile = TileStackFactory.getTileById(15);
 
         assertThat(isValid(tile, 0, -1)).isTrue();
     }
 
     @Test
     public void validTilePlacement_matchingSections_placedRightOfExistingTile() {
-        Tile tile = TileStackFactory.getTile(22);
+        Tile tile = TileStackFactory.getTileById(22);
 
         assertThat(isValid(tile, 1, 0)).isTrue();
     }
 
     @Test
     public void invalidTilePlacement_oneMatchingSection_oneMismatchingSection() {
-        Tile validTile = TileStackFactory.getTile(7);
+        Tile validTile = TileStackFactory.getTileById(7);
         assertThat(isValid(validTile, 1, 0)).isTrue();
         this.board.placeTile(validTile, 1, 0);
 
-        Tile anotherValidTile = TileStackFactory.getTile(1);
+        Tile anotherValidTile = TileStackFactory.getTileById(1);
         assertThat(isValid(anotherValidTile, 0, 1)).isTrue();
         this.board.placeTile(validTile, 0, 1);
 
         // the abutting sections between anotherValidTile (city) and this (city) match
         // the abutting sections between validTile (field) and this (road) don't match
-        Tile invalidTile = TileStackFactory.getTile(13);
+        Tile invalidTile = TileStackFactory.getTileById(13);
         assertThat(isValid(invalidTile, 1, 1)).isFalse();
     }
 

@@ -1,15 +1,40 @@
 package net.basilcam.core.features;
 
+import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSectionType;
 
 public class MonasteryFeature implements Feature{
+    private static final int NUMBER_OF_ROWS = 3;
+    private static final int NUMBER_OF_COLUMNS = 3;
+    private Tile[][] tiles;
+
+    public MonasteryFeature(Tile tile) {
+        this.tiles = new Tile[NUMBER_OF_ROWS][NUMBER_OF_COLUMNS];
+        this.tiles[1][1] = tile;
+    }
+
+    public void addTile(Tile tile, int i, int j) {
+        assert i >= 0 && i <= NUMBER_OF_ROWS : "invalid row index";
+        assert j >= 0 && j <= NUMBER_OF_COLUMNS : "invalid column index";
+        assert this.tiles[i][j] == null : "tile already set";
+
+        this.tiles[i][j] = tile;
+    }
+
     @Override
     public boolean isComplete() {
-        return false;
+        for (int i = 0 ; i < NUMBER_OF_ROWS; i++) {
+            for (int j = 0; j < NUMBER_OF_COLUMNS; j++) {
+                if (this.tiles[i][j] == null) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
     public TileSectionType getType() {
-        return null;
+        return TileSectionType.MONASTERY;
     }
 }
