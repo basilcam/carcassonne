@@ -1,6 +1,7 @@
 package net.basilcam.core;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileStackFactory;
@@ -43,7 +44,21 @@ public class Board {
         this.tiles.put(xPosition, yPosition, tile);
     }
 
+    public ImmutableTable<Integer, Integer, Tile> getTiles() {
+        return ImmutableTable.copyOf(tiles);
+    }
+
+    public void forEachTile(TileConsumer consumer) {
+        for (Table.Cell<Integer, Integer, Tile> cell : this.tiles.cellSet()) {
+            consumer.accept(cell.getValue(), cell.getRowKey(), cell.getColumnKey());
+        }
+    }
+
     public void clear() {
         this.tiles.clear();
+    }
+
+    public interface TileConsumer {
+        void accept(Tile tile, int xPosition, int yPosition);
     }
 }

@@ -18,7 +18,7 @@ public class MonasteryFeatureManager implements FeatureManager {
         this.board = board;
         this.centerTileToFeature = new HashMap<>();
 
-        // todo: assumes board has no monasteries
+        this.board.forEachTile(this::updateFeatures);
     }
 
     @Override

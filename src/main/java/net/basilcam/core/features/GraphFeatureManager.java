@@ -16,10 +16,7 @@ public class GraphFeatureManager implements FeatureManager {
         this.board = board;
         this.tileSectionToFeature = new HashMap<>();
 
-        // todo: i don't like this explicity replies on start tile location / existence
-        Optional<Tile> startTile = this.board.getTile(0, 0);
-        assert startTile.isPresent();
-        updateFeatures(startTile.get(), 0, 0);
+        this.board.forEachTile(this::updateFeatures);
     }
 
     @Override
