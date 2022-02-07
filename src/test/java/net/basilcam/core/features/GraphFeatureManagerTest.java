@@ -168,7 +168,23 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldNotAllowPlacingMeepleOnCityWithExistingMeeple() {
+        Tile tile8 = TileStackFactory.getTileById(8);
+        tile8.rotateClockwise();
+        placeTileAndUpdate(tile8, 0, 1);
 
+        TileSection citySection = tile8.getBottomSection();
+        assertThat(citySection.getType()).isEqualTo(TileSectionType.CITY);
+        assertThat(this.featureManager.canPlaceMeeple(tile8, citySection)).isTrue();
+        placeMeeple(citySection);
+
+        Tile tile20 = TileStackFactory.getTileById(20);
+        tile20.rotateClockwise();
+        tile20.rotateClockwise();
+        placeTileAndUpdate(tile20, 0, 2);
+
+        citySection = tile20.getBottomSection();
+        assertThat(citySection.getType()).isEqualTo(TileSectionType.CITY);
+        assertThat(this.featureManager.canPlaceMeeple(tile20, citySection)).isFalse();
     }
 
     private void placeMeeple(TileSection tileSection) {
