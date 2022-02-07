@@ -3,10 +3,10 @@ package net.basilcam.core.features;
 import com.google.common.collect.Lists;
 import net.basilcam.core.Board;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileSection;
+import net.basilcam.core.tiles.TileSectionType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class CompositeFeatureManager implements FeatureManager {
     private final List<FeatureManager> featureManagers;
@@ -38,5 +38,32 @@ public class CompositeFeatureManager implements FeatureManager {
             features.addAll(featureManager.getFeatures());
         }
         return features;
+    }
+
+    @Override
+    public boolean canPlaceMeeple(Tile tile, TileSection section) {
+        // todo: improve this. too explicit. check with each feature manager instead
+        if (section.getType() != TileSectionType.CITY
+                && section.getType() != TileSectionType.ROAD
+                && section.getType() != TileSectionType.MONASTERY) {
+            return false;
+        }
+
+        if (section.getMeeple().isPresent()) {
+            return false;
+        }
+
+        for (TileSection anotherSection : tile.getSections()) {
+            if (anotherSection.getMeeple().isPresent()) {
+                return false;
+            }
+        }
+
+        for (FeatureManager featureManager : this.featureManagers) {
+            if (!featureManager.canPlaceMeeple(tile, section)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -3,7 +3,7 @@ package net.basilcam.core.features;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSectionType;
 
-public class MonasteryFeature implements Feature{
+public class MonasteryFeature implements Feature {
     private static final int NUMBER_OF_ROWS = 3;
     private static final int NUMBER_OF_COLUMNS = 3;
     private Tile[][] tiles;

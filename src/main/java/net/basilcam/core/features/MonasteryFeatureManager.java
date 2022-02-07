@@ -1,6 +1,7 @@
 package net.basilcam.core.features;
 
 import net.basilcam.core.Board;
+import net.basilcam.core.Meeple;
 import net.basilcam.core.Pair;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
@@ -78,6 +79,11 @@ public class MonasteryFeatureManager implements FeatureManager {
     @Override
     public Collection<? extends Feature> getFeatures() {
         return this.centerTileToFeature.values();
+    }
+
+    @Override
+    public boolean canPlaceMeeple(Tile tile, TileSection section) {
+        return true;
     }
 
     @VisibleForTesting

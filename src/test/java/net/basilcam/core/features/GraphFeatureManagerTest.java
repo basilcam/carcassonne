@@ -1,7 +1,9 @@
 package net.basilcam.core.features;
 
 import net.basilcam.core.Board;
+import net.basilcam.core.Meeple;
 import net.basilcam.core.PlacementValidator;
+import net.basilcam.core.Player;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
@@ -11,17 +13,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GraphFeatureManagerTest {
     private Board board;
     private GraphFeatureManager featureManager;
+    private Player player;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
         this.featureManager = new GraphFeatureManager(this.board);
+        this.player = Player.createPlayer("cam");
     }
 
     @Test
@@ -142,6 +147,34 @@ public class GraphFeatureManagerTest {
         assertFeatureCount(3);
         assertFeature(TileSectionType.CITY, 2, false);
         assertFeature(TileSectionType.ROAD, 1, true);
+    }
+
+    @Test
+    public void shouldNotAllowPlacingMeepleOnRoadWithExistingMeeple() {
+        Tile tile10 = TileStackFactory.getTileById(10);
+        tile10.rotateClockwise();
+        placeTileAndUpdate(tile10, 1, 0);
+
+        TileSection roadSection = tile10.getLeftSection();
+        assertThat(this.featureManager.canPlaceMeeple(tile10, roadSection)).isTrue();
+        placeMeeple(roadSection);
+
+        Tile tile15 = TileStackFactory.getTileById(15);
+        placeTileAndUpdate(tile15, 2, 0);
+
+        TileSection anotherRoadSection = tile15.getBottomSection();
+        assertThat(this.featureManager.canPlaceMeeple(tile15, anotherRoadSection)).isFalse();
+    }
+
+    @Test
+    public void shouldNotAllowPlacingMeepleOnCityWithExistingMeeple() {
+
+    }
+
+    private void placeMeeple(TileSection tileSection) {
+        Optional<Meeple> meeple = this.player.getMeeple();
+        assertThat(meeple).isPresent();
+        tileSection.placeMeeple(meeple.get());
     }
 
     private void assertFeatureCount(int count) {

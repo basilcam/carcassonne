@@ -1,8 +1,7 @@
 package net.basilcam.core;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Player {
     private static final int MEEPLE_PER_PLAYER = 7;
@@ -27,6 +26,15 @@ public class Player {
 
     public int getScore() {
         return this.score;
+    }
+
+    public Optional<Meeple> getMeeple() {
+        for (Meeple meeple : this.meeples) {
+            if (meeple.getTileSection().isEmpty()) {
+                return Optional.of(meeple);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

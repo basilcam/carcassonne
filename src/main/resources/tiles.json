@@ -17,7 +17,7 @@
       "leftSection": "road",
       "bottomSection": "road",
       "rightSection": "road",
-      "centerSections": ["none"],
+      "centerSections": [],
       "coatOfArms": false
     },
     {
@@ -67,7 +67,7 @@
       "leftSection": "road",
       "bottomSection": "road",
       "rightSection": "road",
-      "centerSections": ["none"],
+      "centerSections": [],
       "coatOfArms": false
     },
     {

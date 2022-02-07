@@ -1,5 +1,6 @@
 package net.basilcam.core.features;
 
+import net.basilcam.core.Meeple;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 
@@ -45,6 +46,16 @@ public class GraphFeature implements Feature {
         for (GraphFeature feature : graphFeatures) {
             this.featureNodes.putAll(feature.featureNodes);
         }
+    }
+
+    public boolean canPlaceMeeple() {
+        for (TileSection otherTileSection : this.featureNodes.keySet()) {
+            if (otherTileSection.getMeeple().isPresent()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

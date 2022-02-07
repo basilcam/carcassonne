@@ -116,26 +116,29 @@ public class CarcassonneApi {
 
         this.featureManager.updateFeatures(tile, xPosition, yPosition);
 
-        scoreFeatures();
-
         this.handlers.forEach(handler -> handler.tilePlaced(tile, xPosition, yPosition));
     }
 
-    public void placeMeeple(TileSection tileSection, Meeple meeple) {
+    public void placeMeeple(Tile tile, TileSection tileSection, Meeple meeple) {
         if (this.gameState != GameState.PLAYING) {
             throw new IllegalStateException("can only place meeples when game is running");
         }
 
-        if (!PlacementValidator.isValid(tileSection, meeple)) {
-            throw new IllegalStateException("tile can not be placed there");
+        if (!this.featureManager.canPlaceMeeple(tile, tileSection)) {
+            // todo: call handler
+            return;
         }
+
+        tileSection.placeMeeple(meeple);
 
         this.handlers.forEach(handler -> handler.meeplePlaced(tileSection, meeple));
     }
 
-    private void scoreFeatures() {
+    public void scoreFeatures() {
 
         // todo
+
+        // todo: add list of scored features to each player. add there when scoring. then remove meeple
 
         this.handlers.forEach(handler -> handler.scoreUpdate(null));
     }

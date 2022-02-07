@@ -1,8 +1,11 @@
 package net.basilcam.core.features;
 
 import net.basilcam.core.Board;
+import net.basilcam.core.Meeple;
 import net.basilcam.core.PlacementValidator;
+import net.basilcam.core.Player;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 import net.basilcam.core.tiles.TileStackFactory;
 import org.assertj.core.api.Condition;
@@ -10,17 +13,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CompositeFeatureManagerTest {
     private Board board;
     private CompositeFeatureManager featureManager;
+    private Player player;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
         this.featureManager = new CompositeFeatureManager(board);
+        this.player = Player.createPlayer("cam");
     }
 
     @Test
@@ -89,6 +95,39 @@ class CompositeFeatureManagerTest {
         assertFeature(TileSectionType.ROAD, 5, false);
         assertFeature(TileSectionType.ROAD, 1, true);
         assertFeature(TileSectionType.MONASTERY, 1, true);
+    }
+
+    @Test
+    public void shouldNotAllowPlacingMeepleOnFieldSection() {
+        Tile tile10 = TileStackFactory.getTileById(10);
+        tile10.rotateClockwise();
+        placeTileAndUpdate(tile10, 1, 0);
+
+        TileSection section = tile10.getBottomSection();
+        assertThat(section.getType()).isEqualTo(TileSectionType.FIELD);
+        assertThat(this.featureManager.canPlaceMeeple(tile10, section)).isFalse();
+    }
+
+    @Test
+    public void shouldNotAllowPlacingMeepleOnTileAlreadyContainingMeeple() {
+        Tile tile10 = TileStackFactory.getTileById(10);
+        tile10.rotateClockwise();
+        placeTileAndUpdate(tile10, 1, 0);
+
+        TileSection section = tile10.getLeftSection();
+        assertThat(section.getType()).isEqualTo(TileSectionType.ROAD);
+        assertThat(this.featureManager.canPlaceMeeple(tile10, section)).isTrue();
+        placeMeeple(section);
+
+        section = tile10.getRightSection();
+        assertThat(section.getType()).isEqualTo(TileSectionType.ROAD);
+        assertThat(this.featureManager.canPlaceMeeple(tile10, section)).isFalse();
+    }
+
+    private void placeMeeple(TileSection tileSection) {
+        Optional<Meeple> meeple = this.player.getMeeple();
+        assertThat(meeple).isPresent();
+        tileSection.placeMeeple(meeple.get());
     }
 
     private void assertFeatureCount(int count) {

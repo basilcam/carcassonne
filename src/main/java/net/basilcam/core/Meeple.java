@@ -6,10 +6,14 @@ import java.util.Optional;
 
 public class Meeple {
     private final Player owner;
-    private Optional<TileSection> tile;
+    private Optional<TileSection> tileSection;
 
     public Meeple(Player owner) {
         this.owner = owner;
-        this.tile = Optional.empty();
+        this.tileSection = Optional.empty();
+    }
+
+    Optional<TileSection> getTileSection() {
+        return this.tileSection;
     }
 }

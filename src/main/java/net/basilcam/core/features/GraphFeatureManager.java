@@ -5,6 +5,7 @@ import net.basilcam.core.Direction;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -36,6 +37,19 @@ public class GraphFeatureManager implements FeatureManager {
     @Override
     public Collection<GraphFeature> getFeatures() {
         return Set.copyOf(this.tileSectionToFeature.values());
+    }
+
+    @Override
+    public boolean canPlaceMeeple(Tile tile, TileSection section) {
+        if (!isSupportedFeatureType(section.getType())) {
+            return true;
+        }
+
+        @Nullable GraphFeature feature = this.tileSectionToFeature.get(section);
+        if (feature == null) {
+            return true;
+        }
+        return feature.canPlaceMeeple();
     }
 
     private void updateFeaturesForEdges(Tile tile, int xPosition, int yPosition, Direction direction) {

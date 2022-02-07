@@ -54,9 +54,4 @@ public enum PlacementValidator {
 
         return true;
     }
-
-    public static boolean isValid(TileSection tileSection, Meeple meeple) {
-        // todo
-        return false;
-    }
 }

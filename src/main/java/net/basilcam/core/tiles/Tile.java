@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.basilcam.core.Direction;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Tile {
@@ -47,6 +48,17 @@ public class Tile {
 
         }
     }
+
+    public Collection<TileSection> getSections() {
+        List<TileSection> sections = new ArrayList<>();
+        sections.add(getTopSection());
+        sections.add(getLeftSection());
+        sections.add(getBottomSection());
+        sections.add(getRightSection());
+        sections.addAll(getCenterSections());
+        return sections;
+    }
+
 
     public TileSection getTopSection() {
         return topSection;
