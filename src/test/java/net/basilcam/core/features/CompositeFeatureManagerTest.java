@@ -24,127 +24,85 @@ class CompositeFeatureManagerTest {
     }
 
     @Test
-    public void shouldUpdateFeaturesForStartTile() {
-        Collection<? extends Feature> features = this.featureManager.getFeatures();
-
-        assertThat(features).hasSize(2); // city, road
-        assertThat(features).allMatch(feature -> !feature.isComplete());
-
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.CITY
-                        && !feature.isComplete(),
-                "city"));
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD
-                        && !feature.isComplete(),
-                "road"));
-    }
-
-    @Test
-    public void shouldUpdateFeatures_tilePlacedAboveStartTile() {
-        Tile tile = TileStackFactory.getTileById(20);
-        tile.rotateClockwise();
-        tile.rotateClockwise();
-
-        assertThat(PlacementValidator.isValid(this.board, 0, 1, tile)).isTrue();
-        this.board.placeTile(tile, 0, 1);
-
-        this.featureManager.updateFeatures(tile, 0, 1);
-
-        Collection<? extends Feature> features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(2);
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.CITY
-                        && feature.isComplete(),
-                "city"));
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD && !feature.isComplete(),
-                "road"));
-    }
-
-    @Test
-    public void shouldUpdateFeatures_tilePlacedBesideTwoTiles() {
-        Tile tile15 = TileStackFactory.getTileById(15);
+    public void shouldCompleteFeatureOfEachType() {
         Tile tile11 = TileStackFactory.getTileById(11);
         tile11.rotateClockwise();
         tile11.rotateClockwise();
+        placeTileAndUpdate(tile11, 0, 1);
+        assertFeatureCount(2);
+        assertFeature(TileSectionType.CITY, 1, false);
+        assertFeature(TileSectionType.ROAD, 1, false);
+
         Tile tile20 = TileStackFactory.getTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         tile20.rotateClockwise();
-
-        placeTileAndUpdate(tile15, 1, 0);
-
-        Collection<? extends Feature> features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(2);
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.CITY
-                        && !feature.isComplete(),
-                "city"));
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD
-                        && !feature.isComplete(),
-                "road"));
-
-        placeTileAndUpdate(tile11, 0, 1);
-
-        features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(2);
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.CITY
-                        && !feature.isComplete(),
-                "city"));
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD
-                        && !feature.isComplete(),
-                "road"));
-
         placeTileAndUpdate(tile20, 1, 1);
+        assertFeatureCount(2);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 1, false);
 
-        features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(2);
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.CITY
-                        && feature.isComplete(),
-                "city"));
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD
-                        && !feature.isComplete(),
-                "road"));
-    }
-
-    @Test
-    public void shouldUpdateFeatures_circleRoad() {
-        Tile tile15 = TileStackFactory.getTileById(15);
-        Tile tile2 = TileStackFactory.getTileById(2);
-        Tile tile10 = TileStackFactory.getTileById(10);
-        tile10.rotateClockwise();
         Tile tile7 = TileStackFactory.getTileById(7);
         tile7.rotateClockwise();
         tile7.rotateClockwise();
-        Tile tile14 = TileStackFactory.getTileById(14);
+        tile7.rotateClockwise();
+        placeTileAndUpdate(tile7, 2, 1);
+        assertFeatureCount(5);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 4, false);
 
-        placeTileAndUpdate(tile15, 1, 0);
-        placeTileAndUpdate(tile2, 1, -1);
-        placeTileAndUpdate(tile10, 0, -1);
-        placeTileAndUpdate(tile7, -1, -1);
-        placeTileAndUpdate(tile14, -1, 0);
+        Tile tile18 = TileStackFactory.getTileById(18);
+        tile18.rotateClockwise();
+        placeTileAndUpdate(tile18, 1, 0);
+        assertFeatureCount(6);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 4, false);
+        assertFeature(TileSectionType.MONASTERY, 1, false);
 
+        Tile tile10_1 = TileStackFactory.getTileById(10);
+        placeTileAndUpdate(tile10_1, 2, 0);
+        assertFeatureCount(6);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 4, false);
+        assertFeature(TileSectionType.MONASTERY, 1, false);
+
+        Tile tile7_2 = TileStackFactory.getTileById(7);
+        placeTileAndUpdate(tile7_2, 0, -1);
+        assertFeatureCount(9);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 7, false);
+        assertFeature(TileSectionType.MONASTERY, 1, false);
+
+        Tile tile10_3 = TileStackFactory.getTileById(10);
+        tile10_3.rotateClockwise();
+        placeTileAndUpdate(tile10_3, 1, -1);
+        assertFeatureCount(9);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 7, false);
+        assertFeature(TileSectionType.MONASTERY, 1, false);
+
+        Tile tile15 = TileStackFactory.getTileById(15);
+        tile15.rotateClockwise();
+        placeTileAndUpdate(tile15, 2, -1);
+        assertFeatureCount(8);
+        assertFeature(TileSectionType.CITY, 1, true);
+        assertFeature(TileSectionType.ROAD, 5, false);
+        assertFeature(TileSectionType.ROAD, 1, true);
+        assertFeature(TileSectionType.MONASTERY, 1, true);
+    }
+
+    private void assertFeatureCount(int count) {
+        assertThat(this.featureManager.getFeatures()).hasSize(count);
+    }
+
+    private void assertFeature(TileSectionType type, int count, boolean isComplete) {
         Collection<? extends Feature> features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(7);
 
-        assertThat(features).areExactly(2, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD
-                && feature.isComplete(),
-                "road"));
-        assertThat(features).areExactly(3, new Condition<>(
-                feature -> feature.getType() == TileSectionType.ROAD
-                        && !feature.isComplete(),
-                "road"));
-        assertThat(features).areExactly(2, new Condition<>(
-                feature -> feature.getType() == TileSectionType.CITY
-                && !feature.isComplete(),
-                "city"));
+        assertThat(features).areExactly(count, new Condition<>(
+                feature -> feature.getType() == type
+                        && feature.isComplete() == isComplete,
+                ""));
+
     }
 
     private void placeTileAndUpdate(Tile tile, int xPosition, int yPosition) {

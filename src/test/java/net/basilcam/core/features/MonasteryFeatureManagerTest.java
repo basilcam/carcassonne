@@ -29,7 +29,7 @@ class MonasteryFeatureManagerTest {
 
     @Test
     public void shouldInitiallyHaveNoFeatures() {
-        assertThat(this.featureManager.getFeatures()).isEmpty();
+        assertFeatureCount(0);
     }
 
     @Test
@@ -39,59 +39,54 @@ class MonasteryFeatureManagerTest {
 
         placeTileAndUpdate(tile18, 1, 0);
 
-        Collection<? extends Feature> features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(1);
-
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.MONASTERY
-                        && !feature.isComplete(),
-                "monastery"));
+        assertFeatureCount(1);
+        assertFeature(TileSectionType.MONASTERY, 1, false);
     }
 
     @Test
-    public void shouldCompleteFeature() {
+    public void shouldCompleteMonasteryFeaturePlacedInCenterOfTiles() {
         Tile tile1 = TileStackFactory.getTileById(1);
         placeTileAndUpdate(tile1, 0, 1);
+        assertFeatureCount(0);
 
         Tile tile20 = TileStackFactory.getTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         placeTileAndUpdate(tile20, 1, 1);
+        assertFeatureCount(0);
 
         Tile tile10 = TileStackFactory.getTileById(10);
         placeTileAndUpdate(tile10, 2, 1);
+        assertFeatureCount(0);
 
         Tile tile15 = TileStackFactory.getTileById(15);
         tile15.rotateClockwise();
         tile15.rotateClockwise();
         placeTileAndUpdate(tile15, 2, 0);
+        assertFeatureCount(0);
 
         Tile tile10_2 = TileStackFactory.getTileById(10);
         tile10_2.rotateClockwise();
         placeTileAndUpdate(tile10_2, 0, -1);
+        assertFeatureCount(0);
 
         Tile tile10_3 = TileStackFactory.getTileById(10);
         tile10_3.rotateClockwise();
         placeTileAndUpdate(tile10_3, 1, -1);
+        assertFeatureCount(0);
 
         Tile tile10_4 = TileStackFactory.getTileById(10);
         tile10_4.rotateClockwise();
         placeTileAndUpdate(tile10_4, 2, -1);
-
-        Collection<? extends Feature> features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(0);
+        assertFeatureCount(0);
 
         Tile tile18 = TileStackFactory.getTileById(18);
         tile18.rotateClockwise();
-
         placeTileAndUpdate(tile18, 1, 0);
-        features = this.featureManager.getFeatures();
-        assertThat(features).hasSize(1);
-        assertThat(features).areExactly(1, new Condition<>(
-                feature -> feature.getType() == TileSectionType.MONASTERY
-                        && feature.isComplete(),
-                "monastery"));
+
+        assertFeatureCount(1);
+        assertFeature(TileSectionType.MONASTERY, 1, true);
     }
 
     @Test
@@ -126,6 +121,19 @@ class MonasteryFeatureManagerTest {
             assertThat(indices.getFirst()).isEqualTo(expectedTileIndicesIJ.getFirst());
             assertThat(indices.getSecond()).isEqualTo(expectedTileIndicesIJ.getSecond());
         }
+    }
+
+    private void assertFeatureCount(int count) {
+        assertThat(this.featureManager.getFeatures()).hasSize(count);
+    }
+
+    private void assertFeature(TileSectionType type, int count, boolean isComplete) {
+        Collection<? extends Feature> features = this.featureManager.getFeatures();
+
+        assertThat(features).areExactly(count, new Condition<>(
+                feature -> feature.getType() == type
+                        && feature.isComplete() == isComplete,
+                ""));
     }
 
     private void placeTileAndUpdate(Tile tile, int xPosition, int yPosition) {
