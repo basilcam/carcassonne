@@ -1,18 +1,26 @@
 package net.basilcam.core.features;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import net.basilcam.core.Meeple;
+import net.basilcam.core.Player;
+import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 
 import java.util.*;
 
 public class GraphFeature implements Feature {
+    private static final int ROAD_POINTS_PER_TILE = 1;
+    private static final int CITY_POINTS_PER_TILE = 2;
     private final Map<TileSection, GraphFeatureNode> featureNodes;
     private final TileSectionType type;
+    private boolean hasBeenScored;
 
     public GraphFeature(TileSectionType type) {
         this.featureNodes = new HashMap<>();
         this.type = type;
+        this.hasBeenScored = false;
     }
 
     @Override
@@ -28,6 +36,55 @@ public class GraphFeature implements Feature {
     @Override
     public TileSectionType getType() {
         return this.type;
+    }
+
+    @Override
+    public void score() {
+        // todo: pretty inefficient, refactor to simplify
+
+        if (!isComplete() || this.hasBeenScored) {
+            return;
+        }
+
+        this.hasBeenScored = true;
+
+        Set<Tile> tiles = new HashSet<>();
+        Multimap<Player, Meeple> meeples = HashMultimap.create();
+        for (TileSection tileSection : this.featureNodes.keySet()) {
+            if (tileSection.getMeeple().isPresent()) {
+                Meeple meeple = tileSection.getMeeple().get();
+                Player owner = meeple.getOwner();
+                meeples.put(owner, meeple);
+
+                meeple.removeFromTileSection();
+                tileSection.removeMeeple();
+            }
+            tiles.add(tileSection.getTile());
+        }
+
+        int tileCount = tiles.size();
+        int score = tileCount * (this.type == TileSectionType.CITY ? CITY_POINTS_PER_TILE : ROAD_POINTS_PER_TILE);
+
+        int maxMeepleCount = 0;
+        List<Player> playersWithMaxMeepleCount = new ArrayList<>();
+        for (Map.Entry<Player, Collection<Meeple>> entry : meeples.asMap().entrySet()) {
+            if (entry.getValue().size() > maxMeepleCount) {
+                maxMeepleCount = entry.getValue().size();
+                playersWithMaxMeepleCount.clear();
+                playersWithMaxMeepleCount.add(entry.getKey());
+            } else if (entry.getValue().size() == maxMeepleCount) {
+                playersWithMaxMeepleCount.add(entry.getKey());
+            }
+        }
+
+        int scorePerPlayer = 0;
+        if (!playersWithMaxMeepleCount.isEmpty()) {
+            scorePerPlayer = score / playersWithMaxMeepleCount.size();
+        }
+
+        for (Player player : playersWithMaxMeepleCount) {
+            player.addScore(scorePerPlayer);
+        }
     }
 
     public void addNode(GraphFeatureNode node) {

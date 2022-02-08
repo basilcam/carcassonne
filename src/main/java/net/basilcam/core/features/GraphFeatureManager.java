@@ -52,6 +52,12 @@ public class GraphFeatureManager implements FeatureManager {
         return feature.canPlaceMeeple();
     }
 
+    @Override
+    public void scoreFeatures() {
+        // todo: very inefficient
+        new HashSet<>(this.tileSectionToFeature.values()).forEach(GraphFeature::score);
+    }
+
     private void updateFeaturesForEdges(Tile tile, int xPosition, int yPosition, Direction direction) {
         TileSection tileSection = tile.getSection(direction);
 

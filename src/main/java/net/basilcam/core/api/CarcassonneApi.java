@@ -141,12 +141,12 @@ public class CarcassonneApi {
             // todo: call handler
             return;
         }
-
-        // todo: ensure only one meeple is placed per turn
-
-        // todo: ensure owning player is current player
+        if (!meeple.getOwner().equals(this.turnState.get().getCurrentPlayer())) {
+            throw new IllegalStateException("can only place meeple belonging to player who's turn it is");
+        }
 
         tileSection.placeMeeple(meeple);
+        meeple.setTileSection(tileSection);
 
         this.handlers.forEach(handler -> handler.meeplePlaced(tileSection, meeple));
     }
@@ -159,10 +159,10 @@ public class CarcassonneApi {
             throw new IllegalStateException("can only score features after placing tile");
         }
 
-        // todo
+        this.featureManager.scoreFeatures();
 
-        // todo: add list of scored features to each player. add there when scoring. then remove meeple
-
-        this.handlers.forEach(handler -> handler.scoreUpdate(null));
+        for (Player player : this.players) {
+            this.handlers.forEach(handler -> handler.scoreUpdate(player));
+        }
     }
 }

@@ -8,7 +8,7 @@ public class Player {
 
     private final String name;
     private int score;
-    private Meeple[] meeples;
+    private final Meeple[] meeples;
 
     public static Player createPlayer(String name) {
         Player player = new Player(name);

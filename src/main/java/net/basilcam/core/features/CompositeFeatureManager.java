@@ -64,6 +64,12 @@ public class CompositeFeatureManager implements FeatureManager {
                 return false;
             }
         }
+
         return true;
+    }
+
+    @Override
+    public void scoreFeatures() {
+        this.featureManagers.forEach(FeatureManager::scoreFeatures);
     }
 }

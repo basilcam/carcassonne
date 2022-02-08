@@ -13,7 +13,19 @@ public class Meeple {
         this.tileSection = Optional.empty();
     }
 
-    Optional<TileSection> getTileSection() {
+    public Player getOwner() {
+        return this.owner;
+    }
+
+    public Optional<TileSection> getTileSection() {
         return this.tileSection;
+    }
+
+    public void setTileSection(TileSection tileSection) {
+        this.tileSection = Optional.of(tileSection);
+    }
+
+    public void removeFromTileSection() {
+        this.tileSection = Optional.empty();
     }
 }

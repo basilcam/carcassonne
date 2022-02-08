@@ -6,7 +6,6 @@ import net.basilcam.core.tiles.TileSection;
 import java.util.Optional;
 
 public enum PlacementValidator {
-
     ;
 
     public static boolean isValid(Board board, int xPosition, int yPosition, Tile tile) {
