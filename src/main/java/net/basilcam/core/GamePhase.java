@@ -1,7 +1,7 @@
 package net.basilcam.core;
 
-public enum GameState {
+public enum GamePhase {
     SETUP,
     PLAYING,
-    ENDED
+    ENDED;
 }
