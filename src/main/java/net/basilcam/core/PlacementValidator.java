@@ -14,9 +14,12 @@ public enum PlacementValidator {
             return false;
         }
 
+        int adjacentTileCount = 0;
+
         TileSection topSection = tile.getTopSection();
         Optional<Tile> adjacentTile = board.getTile(xPosition, yPosition + 1);
         if (adjacentTile.isPresent()) {
+            adjacentTileCount++;
             TileSection adjacentSection = adjacentTile.get().getBottomSection();
             if (adjacentSection.getType() != topSection.getType()) {
                 return false;
@@ -26,6 +29,7 @@ public enum PlacementValidator {
         TileSection leftSection = tile.getLeftSection();
         adjacentTile = board.getTile(xPosition - 1, yPosition);
         if (adjacentTile.isPresent()) {
+            adjacentTileCount++;
             TileSection adjacentSection = adjacentTile.get().getRightSection();
             if (adjacentSection.getType() != leftSection.getType()) {
                 return false;
@@ -35,6 +39,7 @@ public enum PlacementValidator {
         TileSection bottomSection = tile.getBottomSection();
         adjacentTile = board.getTile(xPosition, yPosition - 1);
         if (adjacentTile.isPresent()) {
+            adjacentTileCount++;
             TileSection adjacentSection = adjacentTile.get().getTopSection();
             if (adjacentSection.getType() != bottomSection.getType()) {
                 return false;
@@ -44,13 +49,16 @@ public enum PlacementValidator {
         adjacentTile = board.getTile(xPosition + 1, yPosition);
         TileSection rightSection = tile.getRightSection();
         if (adjacentTile.isPresent()) {
+            adjacentTileCount++;
             TileSection adjacentSection = adjacentTile.get().getLeftSection();
             if (adjacentSection.getType() != rightSection.getType()) {
                 return false;
             }
         }
 
-        // todo: ensure abutting at least one other tile
+        if (adjacentTileCount == 0) {
+            return false;
+        }
 
         return true;
     }

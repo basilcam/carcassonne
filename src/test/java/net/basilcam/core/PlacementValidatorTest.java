@@ -94,9 +94,13 @@ class PlacementValidatorTest {
         assertThat(isValid(invalidTile, 1, 1)).isFalse();
     }
 
+    @Test
+    public void invalidTilePlacement_noAbuttingTiles() {
+        Tile tile = TileStackFactory.getTileById(1);
+        assertThat(isValid(tile, 0, 2)).isFalse();
+    }
 
     private boolean isValid(Tile tile, int xPosition, int yPosition) {
         return PlacementValidator.isValid(this.board, xPosition, yPosition, tile);
-
     }
 }
