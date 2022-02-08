@@ -18,14 +18,16 @@ public class GraphFeatureManagerTest {
     private Board board;
     private TestTileManager tileManager;
     private GraphFeatureManager featureManager;
-    private Player player;
+    private Player player1;
+    private Player player2;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
         this.tileManager = new TestTileManager();
         this.featureManager = new GraphFeatureManager(this.board, this.tileManager.getTileManager());
-        this.player = Player.createPlayer("cam");
+        this.player1 = Player.createPlayer("cam");
+        this.player2 = Player.createPlayer("basil");
     }
 
     @Test
@@ -48,7 +50,7 @@ public class GraphFeatureManagerTest {
     }
 
     @Test
-    public void shouldUpdateFeatures_tilePlacedBesideTwoTiles_t() {
+    public void shouldUpdateFeatures_tilePlacedBesideTwoTiles() {
         Tile tile15 = tileManager.drawTileById(15);
         placeTileAndUpdate(tile15, 1, 0);
         assertFeatureCount(2);
@@ -156,7 +158,7 @@ public class GraphFeatureManagerTest {
 
         TileSection roadSection = tile10.getLeftSection();
         assertThat(this.featureManager.canPlaceMeeple(tile10, roadSection)).isTrue();
-        placeMeeple(roadSection);
+        placeMeeple(tile10, roadSection, this.player1);
 
         Tile tile15 = tileManager.drawTileById(15);
         placeTileAndUpdate(tile15, 2, 0);
@@ -174,7 +176,7 @@ public class GraphFeatureManagerTest {
         TileSection citySection = tile8.getBottomSection();
         assertThat(citySection.getType()).isEqualTo(TileSectionType.CITY);
         assertThat(this.featureManager.canPlaceMeeple(tile8, citySection)).isTrue();
-        placeMeeple(citySection);
+        placeMeeple(tile8, citySection, this.player1);
 
         Tile tile20 = tileManager.drawTileById(20);
         tile20.rotateClockwise();
@@ -186,10 +188,207 @@ public class GraphFeatureManagerTest {
         assertThat(this.featureManager.canPlaceMeeple(tile20, citySection)).isFalse();
     }
 
-    private void placeMeeple(TileSection tileSection) {
-        Optional<Meeple> meeple = this.player.getMeeple();
+    @Test
+    public void shouldScoreCity_singleMeeple() {
+        // temp tiles are placed to make important tiles legal
+
+        Tile tileTemp1 = tileManager.drawTileById(15);
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        placeTileAndUpdate(tileTemp1, -1, 0);
+
+        Tile tileTemp2 = tileManager.drawTileById(15);
+        placeTileAndUpdate(tileTemp2, 1, 0);
+
+        Tile tile20_1 = tileManager.drawTileById(20);
+        tile20_1.rotateClockwise();
+        placeTileAndUpdate(tile20_1, -1, 1);
+        placeMeeple(tile20_1, tile20_1.getRightSection(), this.player1);
+
+        Tile tile20_2 = tileManager.drawTileById(20);
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        placeTileAndUpdate(tile20_2, 1, 1);
+
+        Tile tileTemp3 = tileManager.drawTileById(15);
+        tileTemp3.rotateClockwise();
+        tileTemp3.rotateClockwise();
+        placeTileAndUpdate(tileTemp3, 1, 2);
+
+        Tile tile20_3 = tileManager.drawTileById(20);
+        tile20_3.rotateClockwise();
+        tile20_3.rotateClockwise();
+        placeTileAndUpdate(tile20_3, 0, 2);
+
+        Tile tile1 = tileManager.drawTileById(1);
+        placeTileAndUpdate(tile1, 0, 1);
+
+        assertFeature(TileSectionType.CITY, 1, true);
+
+        this.featureManager.scoreFeatures();
+
+        int numberOfTiles = 5;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        assertThat(this.player1.getScore()).isEqualTo(totalScore);
+        assertThat(this.player2.getScore()).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldScoreCity_twoDifferentPlayerMeeples_sameNumber() {
+        // temp tiles are placed to make important tiles legal
+
+        Tile tileTemp1 = tileManager.drawTileById(15);
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        placeTileAndUpdate(tileTemp1, -1, 0);
+
+        Tile tileTemp2 = tileManager.drawTileById(15);
+        placeTileAndUpdate(tileTemp2, 1, 0);
+
+        Tile tile20_1 = tileManager.drawTileById(20);
+        tile20_1.rotateClockwise();
+        placeTileAndUpdate(tile20_1, -1, 1);
+        placeMeeple(tile20_1, tile20_1.getRightSection(), this.player1);
+
+        Tile tile20_2 = tileManager.drawTileById(20);
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        placeTileAndUpdate(tile20_2, 1, 1);
+        placeMeeple(tile20_2, tile20_2.getLeftSection(), this.player2);
+
+        Tile tileTemp3 = tileManager.drawTileById(15);
+        tileTemp3.rotateClockwise();
+        tileTemp3.rotateClockwise();
+        placeTileAndUpdate(tileTemp3, 1, 2);
+
+        Tile tile20_3 = tileManager.drawTileById(20);
+        tile20_3.rotateClockwise();
+        tile20_3.rotateClockwise();
+        placeTileAndUpdate(tile20_3, 0, 2);
+
+        Tile tile1 = tileManager.drawTileById(1);
+        placeTileAndUpdate(tile1, 0, 1);
+
+        assertFeature(TileSectionType.CITY, 1, true);
+
+        this.featureManager.scoreFeatures();
+
+        int numberOfTiles = 5;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        int pointsPerPlayer = totalScore / 2;
+        assertThat(this.player1.getScore()).isEqualTo(pointsPerPlayer);
+        assertThat(this.player2.getScore()).isEqualTo(pointsPerPlayer);
+    }
+
+    @Test
+    public void shouldScoreCity_twoDifferentPlayerMeeples_oneHasMore() {
+        // temp tiles are placed to make important tiles legal
+
+        Tile tileTemp1 = tileManager.drawTileById(15);
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        placeTileAndUpdate(tileTemp1, -1, 0);
+
+        Tile tileTemp2 = tileManager.drawTileById(15);
+        placeTileAndUpdate(tileTemp2, 1, 0);
+
+        Tile tile20_1 = tileManager.drawTileById(20);
+        tile20_1.rotateClockwise();
+        placeTileAndUpdate(tile20_1, -1, 1);
+        placeMeeple(tile20_1, tile20_1.getRightSection(), this.player1);
+
+        Tile tile20_2 = tileManager.drawTileById(20);
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        placeTileAndUpdate(tile20_2, 1, 1);
+        placeMeeple(tile20_2, tile20_2.getLeftSection(), this.player2);
+
+        Tile tileTemp3 = tileManager.drawTileById(15);
+        tileTemp3.rotateClockwise();
+        tileTemp3.rotateClockwise();
+        placeTileAndUpdate(tileTemp3, 1, 2);
+
+        Tile tile20_3 = tileManager.drawTileById(20);
+        tile20_3.rotateClockwise();
+        tile20_3.rotateClockwise();
+        placeTileAndUpdate(tile20_3, 0, 2);
+        placeMeeple(tile20_3, tile20_3.getBottomSection(), this.player1);
+
+        Tile tile1 = tileManager.drawTileById(1);
+        placeTileAndUpdate(tile1, 0, 1);
+
+        assertFeature(TileSectionType.CITY, 1, true);
+
+        this.featureManager.scoreFeatures();
+
+        int numberOfTiles = 5;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        assertThat(this.player1.getScore()).isEqualTo(totalScore);
+        assertThat(this.player2.getScore()).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldScoreCity_twoSamePlayerMeeples() {
+        // temp tiles are placed to make important tiles legal
+
+        Tile tileTemp1 = tileManager.drawTileById(15);
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        tileTemp1.rotateClockwise();
+        placeTileAndUpdate(tileTemp1, -1, 0);
+
+        Tile tileTemp2 = tileManager.drawTileById(15);
+        placeTileAndUpdate(tileTemp2, 1, 0);
+
+        Tile tile20_1 = tileManager.drawTileById(20);
+        tile20_1.rotateClockwise();
+        placeTileAndUpdate(tile20_1, -1, 1);
+        placeMeeple(tile20_1, tile20_1.getRightSection(), this.player1);
+
+        Tile tile20_2 = tileManager.drawTileById(20);
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        tile20_2.rotateClockwise();
+        placeTileAndUpdate(tile20_2, 1, 1);
+        placeMeeple(tile20_2, tile20_2.getLeftSection(), this.player1);
+
+        Tile tileTemp3 = tileManager.drawTileById(15);
+        tileTemp3.rotateClockwise();
+        tileTemp3.rotateClockwise();
+        placeTileAndUpdate(tileTemp3, 1, 2);
+
+        Tile tile20_3 = tileManager.drawTileById(20);
+        tile20_3.rotateClockwise();
+        tile20_3.rotateClockwise();
+        placeTileAndUpdate(tile20_3, 0, 2);
+
+        Tile tile1 = tileManager.drawTileById(1);
+        placeTileAndUpdate(tile1, 0, 1);
+
+        assertFeature(TileSectionType.CITY, 1, true);
+
+        this.featureManager.scoreFeatures();
+
+        int numberOfTiles = 5;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        assertThat(this.player1.getScore()).isEqualTo(totalScore);
+        assertThat(this.player2.getScore()).isEqualTo(0);
+    }
+
+    private void placeMeeple(Tile tile, TileSection tileSection, Player player) {
+        Optional<Meeple> meeple = player.getMeeple();
         assertThat(meeple).isPresent();
+
+        assertThat(this.featureManager.canPlaceMeeple(tile, tileSection)).isTrue();
+
         tileSection.placeMeeple(meeple.get());
+        meeple.get().setTileSection(tileSection);
     }
 
     private void assertFeatureCount(int count) {

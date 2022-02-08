@@ -8,12 +8,13 @@ import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.*;
 
 public class GraphFeature implements Feature {
-    private static final int ROAD_POINTS_PER_TILE = 1;
-    private static final int CITY_POINTS_PER_TILE = 2;
+    @VisibleForTesting public static final int ROAD_POINTS_PER_TILE = 1;
+    @VisibleForTesting public static final int CITY_POINTS_PER_TILE = 2;
     private final TileManager tileManager;
     private final Map<TileSection, GraphFeatureNode> featureNodes;
     private final TileSectionType type;

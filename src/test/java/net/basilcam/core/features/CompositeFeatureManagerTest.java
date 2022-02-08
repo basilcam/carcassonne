@@ -115,15 +115,15 @@ class CompositeFeatureManagerTest {
 
         TileSection section = tile10.getLeftSection();
         assertThat(section.getType()).isEqualTo(TileSectionType.ROAD);
-        assertThat(this.featureManager.canPlaceMeeple(tile10, section)).isTrue();
-        placeMeeple(section);
+        placeMeeple(tile10, section);
 
         section = tile10.getRightSection();
         assertThat(section.getType()).isEqualTo(TileSectionType.ROAD);
         assertThat(this.featureManager.canPlaceMeeple(tile10, section)).isFalse();
     }
 
-    private void placeMeeple(TileSection tileSection) {
+    private void placeMeeple(Tile tile, TileSection tileSection) {
+        assertThat(this.featureManager.canPlaceMeeple(tile, tileSection)).isTrue();
         Optional<Meeple> meeple = this.player.getMeeple();
         assertThat(meeple).isPresent();
         tileSection.placeMeeple(meeple.get());

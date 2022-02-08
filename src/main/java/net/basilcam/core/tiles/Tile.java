@@ -59,7 +59,6 @@ public class Tile {
         return sections;
     }
 
-
     public TileSection getTopSection() {
         return topSection;
     }
