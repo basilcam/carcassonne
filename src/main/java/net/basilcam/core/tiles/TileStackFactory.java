@@ -41,14 +41,6 @@ public enum TileStackFactory {
         return convertJsonToTileMap(jsonTileStack);
     }
 
-    @TestOnly
-    public static Tile getTileById(int id) {
-        Multimap<Integer, Tile> tileMap = createTileMap();
-        Optional<Tile> tile = tileMap.get(id).stream().findFirst();
-        assert tile.isPresent() : "tile does not exist with specified id " + id;
-        return tile.get();
-    }
-
     private static JsonTileConfig.JsonTileStack readStackFromJson() {
         Gson gson = new Gson();
         URL resource = TileStackFactory.class.getClassLoader().getResource(JsonTileConfig.TILES_FILE_NAME);

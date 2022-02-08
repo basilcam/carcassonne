@@ -3,24 +3,23 @@ package net.basilcam.core.api;
 import net.basilcam.core.*;
 import net.basilcam.core.features.CompositeFeatureManager;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
-import net.basilcam.core.tiles.TileStackFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 
 public class CarcassonneApi {
     private final Board board;
     private final List<Player> players;
     private final List<CarcassonneHandler> handlers;
-    private Stack<Tile> tileStack;
     private CompositeFeatureManager featureManager;
 
     private GamePhase gamePhase;
     private int currentPlayerIndex;
     private Optional<TurnState> turnState;
+    private TileManager tileManager;
 
     // todo: some of these callbacks are unnecessary
 
@@ -29,8 +28,8 @@ public class CarcassonneApi {
         this.players = new ArrayList<>();
         this.handlers = new ArrayList<>();
         this.currentPlayerIndex = 0;
-        this.tileStack = new Stack<>();
-        this.featureManager = new CompositeFeatureManager(this.board);
+        this.tileManager = TileManager.create();
+        this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
         this.gamePhase = GamePhase.SETUP;
         this.turnState = Optional.empty();
     }
@@ -39,10 +38,10 @@ public class CarcassonneApi {
         this.players.clear();
         this.currentPlayerIndex = 0;
         this.board.clear();
-        this.tileStack = TileStackFactory.createTileStack();
         this.gamePhase = GamePhase.SETUP;
         this.featureManager.clear();
         this.turnState = Optional.empty();
+        this.tileManager.reset();
     }
 
     public void register(CarcassonneHandler handler) {
@@ -97,7 +96,7 @@ public class CarcassonneApi {
         if (this.turnState.isEmpty() || !this.turnState.get().hasPlacedTile()) {
             throw new IllegalStateException("must place tile before moving to next turn");
         }
-        if (this.tileStack.isEmpty()) {
+        if (!this.tileManager.hasMoreTiles()) {
             this.gamePhase = GamePhase.ENDED;
             this.handlers.forEach(CarcassonneHandler::gameEnded);
             return;

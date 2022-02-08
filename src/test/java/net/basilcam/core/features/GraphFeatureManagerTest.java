@@ -4,10 +4,7 @@ import net.basilcam.core.Board;
 import net.basilcam.core.Meeple;
 import net.basilcam.core.PlacementValidator;
 import net.basilcam.core.Player;
-import net.basilcam.core.tiles.Tile;
-import net.basilcam.core.tiles.TileSection;
-import net.basilcam.core.tiles.TileSectionType;
-import net.basilcam.core.tiles.TileStackFactory;
+import net.basilcam.core.tiles.*;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GraphFeatureManagerTest {
     private Board board;
+    private TestTileManager tileManager;
     private GraphFeatureManager featureManager;
     private Player player;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.featureManager = new GraphFeatureManager(this.board);
+        this.tileManager = new TestTileManager();
+        this.featureManager = new GraphFeatureManager(this.board, this.tileManager.getTileManager());
         this.player = Player.createPlayer("cam");
     }
 
@@ -38,7 +37,7 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_tilePlacedAboveStartTile() {
-        Tile tile = TileStackFactory.getTileById(20);
+        Tile tile = tileManager.drawTileById(20);
         tile.rotateClockwise();
         tile.rotateClockwise();
 
@@ -50,13 +49,13 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_tilePlacedBesideTwoTiles_t() {
-        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile15 = tileManager.drawTileById(15);
         placeTileAndUpdate(tile15, 1, 0);
         assertFeatureCount(2);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile11 = TileStackFactory.getTileById(11);
+        Tile tile11 = tileManager.drawTileById(11);
         tile11.rotateClockwise();
         tile11.rotateClockwise();
         placeTileAndUpdate(tile11, 0, 1);
@@ -64,7 +63,7 @@ public class GraphFeatureManagerTest {
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile20 = TileStackFactory.getTileById(20);
+        Tile tile20 = tileManager.drawTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         tile20.rotateClockwise();
@@ -76,26 +75,26 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_splitCircleRoad() {
-        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile15 = tileManager.drawTileById(15);
         placeTileAndUpdate(tile15, 1, 0);
         assertFeatureCount(2);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile2 = TileStackFactory.getTileById(2);
+        Tile tile2 = tileManager.drawTileById(2);
         placeTileAndUpdate(tile2, 1, -1);
         assertFeatureCount(5);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 4, false);
 
-        Tile tile10 = TileStackFactory.getTileById(10);
+        Tile tile10 = tileManager.drawTileById(10);
         tile10.rotateClockwise();
         placeTileAndUpdate(tile10, 0, -1);
         assertFeatureCount(5);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 4, false);
 
-        Tile tile7 = TileStackFactory.getTileById(7);
+        Tile tile7 = tileManager.drawTileById(7);
         tile7.rotateClockwise();
         tile7.rotateClockwise();
         placeTileAndUpdate(tile7, -1, -1);
@@ -104,7 +103,7 @@ public class GraphFeatureManagerTest {
         assertFeature(TileSectionType.ROAD, 5, false);
         assertFeature(TileSectionType.ROAD, 1, true);
 
-        Tile tile14 = TileStackFactory.getTileById(14);
+        Tile tile14 = tileManager.drawTileById(14);
         placeTileAndUpdate(tile14, -1, 0);
         assertFeatureCount(7);
         assertFeature(TileSectionType.CITY, 2, false);
@@ -114,27 +113,27 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldUpdateFeatures_continuousCircleRoad() {
-        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile15 = tileManager.drawTileById(15);
         placeTileAndUpdate(tile15, 1, 0);
         assertFeatureCount(2);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile15_2 = TileStackFactory.getTileById(15);
+        Tile tile15_2 = tileManager.drawTileById(15);
         tile15_2.rotateClockwise();
         placeTileAndUpdate(tile15_2, 1, -1);
         assertFeatureCount(2);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile10 = TileStackFactory.getTileById(10);
+        Tile tile10 = tileManager.drawTileById(10);
         tile10.rotateClockwise();
         placeTileAndUpdate(tile10, 0, -1);
         assertFeatureCount(2);
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile15_3 = TileStackFactory.getTileById(15);
+        Tile tile15_3 = tileManager.drawTileById(15);
         tile15_3.rotateClockwise();
         tile15_3.rotateClockwise();
         placeTileAndUpdate(tile15_3, -1, -1);
@@ -142,7 +141,7 @@ public class GraphFeatureManagerTest {
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile14 = TileStackFactory.getTileById(14);
+        Tile tile14 = tileManager.drawTileById(14);
         placeTileAndUpdate(tile14, -1, 0);
         assertFeatureCount(3);
         assertFeature(TileSectionType.CITY, 2, false);
@@ -151,7 +150,7 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldNotAllowPlacingMeepleOnRoadWithExistingMeeple() {
-        Tile tile10 = TileStackFactory.getTileById(10);
+        Tile tile10 = tileManager.drawTileById(10);
         tile10.rotateClockwise();
         placeTileAndUpdate(tile10, 1, 0);
 
@@ -159,7 +158,7 @@ public class GraphFeatureManagerTest {
         assertThat(this.featureManager.canPlaceMeeple(tile10, roadSection)).isTrue();
         placeMeeple(roadSection);
 
-        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile15 = tileManager.drawTileById(15);
         placeTileAndUpdate(tile15, 2, 0);
 
         TileSection anotherRoadSection = tile15.getBottomSection();
@@ -168,7 +167,7 @@ public class GraphFeatureManagerTest {
 
     @Test
     public void shouldNotAllowPlacingMeepleOnCityWithExistingMeeple() {
-        Tile tile8 = TileStackFactory.getTileById(8);
+        Tile tile8 = tileManager.drawTileById(8);
         tile8.rotateClockwise();
         placeTileAndUpdate(tile8, 0, 1);
 
@@ -177,7 +176,7 @@ public class GraphFeatureManagerTest {
         assertThat(this.featureManager.canPlaceMeeple(tile8, citySection)).isTrue();
         placeMeeple(citySection);
 
-        Tile tile20 = TileStackFactory.getTileById(20);
+        Tile tile20 = tileManager.drawTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         placeTileAndUpdate(tile20, 0, 2);

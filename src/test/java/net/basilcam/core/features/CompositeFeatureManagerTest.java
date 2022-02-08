@@ -4,10 +4,7 @@ import net.basilcam.core.Board;
 import net.basilcam.core.Meeple;
 import net.basilcam.core.PlacementValidator;
 import net.basilcam.core.Player;
-import net.basilcam.core.tiles.Tile;
-import net.basilcam.core.tiles.TileSection;
-import net.basilcam.core.tiles.TileSectionType;
-import net.basilcam.core.tiles.TileStackFactory;
+import net.basilcam.core.tiles.*;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,19 +16,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CompositeFeatureManagerTest {
     private Board board;
+    private TestTileManager tileManager;
     private CompositeFeatureManager featureManager;
     private Player player;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.featureManager = new CompositeFeatureManager(board);
+        this.tileManager = new TestTileManager();
+        this.featureManager = new CompositeFeatureManager(this.board, this.tileManager.getTileManager());
         this.player = Player.createPlayer("cam");
     }
 
     @Test
     public void shouldCompleteFeatureOfEachType() {
-        Tile tile11 = TileStackFactory.getTileById(11);
+        Tile tile11 = tileManager.drawTileById(11);
         tile11.rotateClockwise();
         tile11.rotateClockwise();
         placeTileAndUpdate(tile11, 0, 1);
@@ -39,7 +38,7 @@ class CompositeFeatureManagerTest {
         assertFeature(TileSectionType.CITY, 1, false);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile20 = TileStackFactory.getTileById(20);
+        Tile tile20 = tileManager.drawTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         tile20.rotateClockwise();
@@ -48,7 +47,7 @@ class CompositeFeatureManagerTest {
         assertFeature(TileSectionType.CITY, 1, true);
         assertFeature(TileSectionType.ROAD, 1, false);
 
-        Tile tile7 = TileStackFactory.getTileById(7);
+        Tile tile7 = tileManager.drawTileById(7);
         tile7.rotateClockwise();
         tile7.rotateClockwise();
         tile7.rotateClockwise();
@@ -57,7 +56,7 @@ class CompositeFeatureManagerTest {
         assertFeature(TileSectionType.CITY, 1, true);
         assertFeature(TileSectionType.ROAD, 4, false);
 
-        Tile tile18 = TileStackFactory.getTileById(18);
+        Tile tile18 = tileManager.drawTileById(18);
         tile18.rotateClockwise();
         placeTileAndUpdate(tile18, 1, 0);
         assertFeatureCount(6);
@@ -65,21 +64,21 @@ class CompositeFeatureManagerTest {
         assertFeature(TileSectionType.ROAD, 4, false);
         assertFeature(TileSectionType.MONASTERY, 1, false);
 
-        Tile tile10_1 = TileStackFactory.getTileById(10);
+        Tile tile10_1 = tileManager.drawTileById(10);
         placeTileAndUpdate(tile10_1, 2, 0);
         assertFeatureCount(6);
         assertFeature(TileSectionType.CITY, 1, true);
         assertFeature(TileSectionType.ROAD, 4, false);
         assertFeature(TileSectionType.MONASTERY, 1, false);
 
-        Tile tile7_2 = TileStackFactory.getTileById(7);
+        Tile tile7_2 = tileManager.drawTileById(7);
         placeTileAndUpdate(tile7_2, 0, -1);
         assertFeatureCount(9);
         assertFeature(TileSectionType.CITY, 1, true);
         assertFeature(TileSectionType.ROAD, 7, false);
         assertFeature(TileSectionType.MONASTERY, 1, false);
 
-        Tile tile10_3 = TileStackFactory.getTileById(10);
+        Tile tile10_3 = tileManager.drawTileById(10);
         tile10_3.rotateClockwise();
         placeTileAndUpdate(tile10_3, 1, -1);
         assertFeatureCount(9);
@@ -87,7 +86,7 @@ class CompositeFeatureManagerTest {
         assertFeature(TileSectionType.ROAD, 7, false);
         assertFeature(TileSectionType.MONASTERY, 1, false);
 
-        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile15 = tileManager.drawTileById(15);
         tile15.rotateClockwise();
         placeTileAndUpdate(tile15, 2, -1);
         assertFeatureCount(8);
@@ -99,7 +98,7 @@ class CompositeFeatureManagerTest {
 
     @Test
     public void shouldNotAllowPlacingMeepleOnFieldSection() {
-        Tile tile10 = TileStackFactory.getTileById(10);
+        Tile tile10 = tileManager.drawTileById(10);
         tile10.rotateClockwise();
         placeTileAndUpdate(tile10, 1, 0);
 
@@ -110,7 +109,7 @@ class CompositeFeatureManagerTest {
 
     @Test
     public void shouldNotAllowPlacingMeepleOnTileAlreadyContainingMeeple() {
-        Tile tile10 = TileStackFactory.getTileById(10);
+        Tile tile10 = tileManager.drawTileById(10);
         tile10.rotateClockwise();
         placeTileAndUpdate(tile10, 1, 0);
 

@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import net.basilcam.core.Board;
 import net.basilcam.core.Pair;
 import net.basilcam.core.PlacementValidator;
+import net.basilcam.core.tiles.TestTileManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSectionType;
-import net.basilcam.core.tiles.TileStackFactory;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,11 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MonasteryFeatureManagerTest {
     private Board board;
     private MonasteryFeatureManager featureManager;
+    private TestTileManager tileManager;
 
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
         this.featureManager = new MonasteryFeatureManager(this.board);
+        this.tileManager = new TestTileManager();
     }
 
     @Test
@@ -34,7 +36,7 @@ class MonasteryFeatureManagerTest {
 
     @Test
     public void shouldAddFeatureWhenPlacingMonastery() {
-        Tile tile18 = TileStackFactory.getTileById(18);
+        Tile tile18 = tileManager.drawTileById(18);
         tile18.rotateClockwise();
 
         placeTileAndUpdate(tile18, 1, 0);
@@ -45,43 +47,43 @@ class MonasteryFeatureManagerTest {
 
     @Test
     public void shouldCompleteMonasteryFeaturePlacedInCenterOfTiles() {
-        Tile tile1 = TileStackFactory.getTileById(1);
+        Tile tile1 = tileManager.drawTileById(1);
         placeTileAndUpdate(tile1, 0, 1);
         assertFeatureCount(0);
 
-        Tile tile20 = TileStackFactory.getTileById(20);
+        Tile tile20 = tileManager.drawTileById(20);
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         tile20.rotateClockwise();
         placeTileAndUpdate(tile20, 1, 1);
         assertFeatureCount(0);
 
-        Tile tile10 = TileStackFactory.getTileById(10);
+        Tile tile10 = tileManager.drawTileById(10);
         placeTileAndUpdate(tile10, 2, 1);
         assertFeatureCount(0);
 
-        Tile tile15 = TileStackFactory.getTileById(15);
+        Tile tile15 = tileManager.drawTileById(15);
         tile15.rotateClockwise();
         tile15.rotateClockwise();
         placeTileAndUpdate(tile15, 2, 0);
         assertFeatureCount(0);
 
-        Tile tile10_2 = TileStackFactory.getTileById(10);
+        Tile tile10_2 = tileManager.drawTileById(10);
         tile10_2.rotateClockwise();
         placeTileAndUpdate(tile10_2, 0, -1);
         assertFeatureCount(0);
 
-        Tile tile10_3 = TileStackFactory.getTileById(10);
+        Tile tile10_3 = tileManager.drawTileById(10);
         tile10_3.rotateClockwise();
         placeTileAndUpdate(tile10_3, 1, -1);
         assertFeatureCount(0);
 
-        Tile tile10_4 = TileStackFactory.getTileById(10);
+        Tile tile10_4 = tileManager.drawTileById(10);
         tile10_4.rotateClockwise();
         placeTileAndUpdate(tile10_4, 2, -1);
         assertFeatureCount(0);
 
-        Tile tile18 = TileStackFactory.getTileById(18);
+        Tile tile18 = tileManager.drawTileById(18);
         tile18.rotateClockwise();
         placeTileAndUpdate(tile18, 1, 0);
 

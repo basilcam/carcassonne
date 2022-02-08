@@ -3,6 +3,7 @@ package net.basilcam.core.features;
 import com.google.common.collect.Lists;
 import net.basilcam.core.Board;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 
@@ -11,9 +12,9 @@ import java.util.*;
 public class CompositeFeatureManager implements FeatureManager {
     private final List<FeatureManager> featureManagers;
 
-    public CompositeFeatureManager(Board board) {
+    public CompositeFeatureManager(Board board, TileManager tileManager) {
         this.featureManagers = Lists.newArrayList(
-                new GraphFeatureManager(board),
+                new GraphFeatureManager(board, tileManager),
                 new MonasteryFeatureManager(board));
     }
 

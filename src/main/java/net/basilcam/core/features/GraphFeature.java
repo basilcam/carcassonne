@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import net.basilcam.core.Meeple;
 import net.basilcam.core.Player;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 
@@ -13,11 +14,13 @@ import java.util.*;
 public class GraphFeature implements Feature {
     private static final int ROAD_POINTS_PER_TILE = 1;
     private static final int CITY_POINTS_PER_TILE = 2;
+    private final TileManager tileManager;
     private final Map<TileSection, GraphFeatureNode> featureNodes;
     private final TileSectionType type;
     private boolean hasBeenScored;
 
-    public GraphFeature(TileSectionType type) {
+    public GraphFeature(TileManager tileManager, TileSectionType type) {
+        this.tileManager = tileManager;
         this.featureNodes = new HashMap<>();
         this.type = type;
         this.hasBeenScored = false;
@@ -59,7 +62,7 @@ public class GraphFeature implements Feature {
                 meeple.removeFromTileSection();
                 tileSection.removeMeeple();
             }
-            tiles.add(tileSection.getTile());
+            tiles.add(tileManager.getTileFromSection(tileSection));
         }
 
         int tileCount = tiles.size();

@@ -7,7 +7,7 @@ import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 
 public class MonasteryFeature implements Feature {
-    private static final int POINTS_PER_MONASTERY = 9;
+    public static final int POINTS_PER_MONASTERY = 9;
     private static final int NUMBER_OF_ROWS = 3;
     private static final int NUMBER_OF_COLUMNS = 3;
     private final Tile[][] tiles;

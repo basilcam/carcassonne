@@ -3,6 +3,7 @@ package net.basilcam.core.features;
 import net.basilcam.core.Board;
 import net.basilcam.core.Direction;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
 import org.jetbrains.annotations.Nullable;
@@ -11,10 +12,12 @@ import java.util.*;
 
 public class GraphFeatureManager implements FeatureManager {
     private final Board board;
+    private final TileManager tileManager;
     private final Map<TileSection, GraphFeature> tileSectionToFeature;
 
-    GraphFeatureManager(Board board) {
+    GraphFeatureManager(Board board, TileManager tileManager) {
         this.board = board;
+        this.tileManager = tileManager;
         this.tileSectionToFeature = new HashMap<>();
 
         this.board.forEachTile(this::updateFeatures);
@@ -81,7 +84,7 @@ public class GraphFeatureManager implements FeatureManager {
             connectAbuttingNode(abuttingFeature, newNode, abuttingSection, direction.oppositeDirection());
             this.tileSectionToFeature.put(tileSection, abuttingFeature);
         } else {
-            GraphFeature feature = new GraphFeature(tileSection.getType());
+            GraphFeature feature = new GraphFeature(tileManager, tileSection.getType());
             feature.addNode(newNode);
             this.tileSectionToFeature.put(tileSection, feature);
         }
@@ -120,7 +123,7 @@ public class GraphFeatureManager implements FeatureManager {
                 continue;
             }
 
-            GraphFeature mergedFeature = new GraphFeature(centerSection.getType());
+            GraphFeature mergedFeature = new GraphFeature(tileManager, centerSection.getType());
             mergedFeature.merge(connectedFeatures);
             for (TileSection tileSection : mergedFeature.getTileSections()) {
                 this.tileSectionToFeature.put(tileSection, mergedFeature);
