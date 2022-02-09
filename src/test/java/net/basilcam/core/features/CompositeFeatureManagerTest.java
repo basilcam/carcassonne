@@ -23,7 +23,7 @@ class CompositeFeatureManagerTest {
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.tileManager = new TestTileManager();
+        this.tileManager = new TestTileManager(this.board);
         this.featureManager = new CompositeFeatureManager(this.board, this.tileManager.getTileManager());
         this.player = Player.createPlayer("cam");
     }

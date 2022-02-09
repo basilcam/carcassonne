@@ -24,7 +24,7 @@ public class GraphFeatureManagerTest {
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.tileManager = new TestTileManager();
+        this.tileManager = new TestTileManager(this.board);
         this.featureManager = new GraphFeatureManager(this.board, this.tileManager.getTileManager());
         this.player1 = Player.createPlayer("cam");
         this.player2 = Player.createPlayer("basil");
@@ -230,7 +230,7 @@ public class GraphFeatureManagerTest {
         this.featureManager.scoreFeatures();
 
         int numberOfTiles = 5;
-        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles + GraphFeature.COAT_OF_ARMS_POINTS_PER_TILE;
         assertThat(this.player1.getScore()).isEqualTo(totalScore);
         assertThat(this.player2.getScore()).isEqualTo(0);
     }
@@ -278,7 +278,7 @@ public class GraphFeatureManagerTest {
         this.featureManager.scoreFeatures();
 
         int numberOfTiles = 5;
-        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles + GraphFeature.COAT_OF_ARMS_POINTS_PER_TILE;
         int pointsPerPlayer = totalScore / 2;
         assertThat(this.player1.getScore()).isEqualTo(pointsPerPlayer);
         assertThat(this.player2.getScore()).isEqualTo(pointsPerPlayer);
@@ -328,7 +328,7 @@ public class GraphFeatureManagerTest {
         this.featureManager.scoreFeatures();
 
         int numberOfTiles = 5;
-        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles + GraphFeature.COAT_OF_ARMS_POINTS_PER_TILE;
         assertThat(this.player1.getScore()).isEqualTo(totalScore);
         assertThat(this.player2.getScore()).isEqualTo(0);
     }
@@ -376,7 +376,7 @@ public class GraphFeatureManagerTest {
         this.featureManager.scoreFeatures();
 
         int numberOfTiles = 5;
-        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles;
+        int totalScore = GraphFeature.CITY_POINTS_PER_TILE * numberOfTiles + GraphFeature.COAT_OF_ARMS_POINTS_PER_TILE;
         assertThat(this.player1.getScore()).isEqualTo(totalScore);
         assertThat(this.player2.getScore()).isEqualTo(0);
     }

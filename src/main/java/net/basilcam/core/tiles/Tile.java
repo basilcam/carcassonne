@@ -14,19 +14,22 @@ public class Tile {
     private TileSection bottomSection;
     private TileSection rightSection;
     private final ImmutableList<TileSection> centerSections;
+    private final boolean hasCoatOfArms;
 
     private Tile(int id,
                  TileSection topSection,
                  TileSection leftSection,
                  TileSection bottomSection,
                  TileSection rightSection,
-                 ImmutableList<TileSection> centerSections) {
+                 ImmutableList<TileSection> centerSections,
+                 boolean hasCoatOfArms) {
         this.id = id;
         this.topSection = topSection;
         this.leftSection = leftSection;
         this.bottomSection = bottomSection;
         this.rightSection = rightSection;
         this.centerSections = centerSections;
+        this.hasCoatOfArms = hasCoatOfArms;
     }
 
     public int getId() {
@@ -79,6 +82,10 @@ public class Tile {
         return this.centerSections;
     }
 
+    public boolean hasCoatOfArms() {
+        return this.hasCoatOfArms;
+    }
+
     public void rotateClockwise() {
         TileSection tempTop = this.topSection;
         TileSection tempLeft = this.leftSection;
@@ -98,6 +105,7 @@ public class Tile {
         private TileSection bottomSection;
         private TileSection rightSection;
         private final List<TileSection> centerSections;
+        private boolean hasCoatOfArms;
 
         Builder(int id) {
             this.id = id;
@@ -129,13 +137,19 @@ public class Tile {
             return this;
         }
 
+        Builder withCoatOfArms(boolean hasCoatOfArms) {
+            this.hasCoatOfArms = hasCoatOfArms;
+            return this;
+        }
+
         Tile build() {
             return new Tile(this.id,
                     this.topSection,
                     this.leftSection,
                     this.bottomSection,
                     this.rightSection,
-                    ImmutableList.copyOf(this.centerSections));
+                    ImmutableList.copyOf(this.centerSections),
+                    hasCoatOfArms);
         }
 
     }

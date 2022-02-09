@@ -14,7 +14,7 @@ class PlacementValidatorTest {
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.tileManager = new TestTileManager();
+        this.tileManager = new TestTileManager(this.board);
     }
 
     @Test

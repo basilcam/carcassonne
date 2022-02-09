@@ -1,5 +1,6 @@
 package net.basilcam.core.tiles;
 
+import net.basilcam.core.Board;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.HashMap;
@@ -14,9 +15,14 @@ public class TileManager {
     private TileManager() {
     }
 
-    public static TileManager create() {
+    public static TileManager create(Board board) {
         TileManager tileManager = new TileManager();
         tileManager.reset();
+
+        board.getTiles().values().forEach(
+                tile -> tile.getSections().forEach(
+                        tileSection -> tileManager.addTileSectionMapping(tileSection, tile)));
+
         return tileManager;
     }
 

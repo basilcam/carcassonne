@@ -1,6 +1,7 @@
 package net.basilcam.core.tiles;
 
 import com.google.common.collect.Multimap;
+import net.basilcam.core.Board;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.Optional;
@@ -8,8 +9,8 @@ import java.util.Optional;
 public class TestTileManager {
     private TileManager tileManager;
 
-    public TestTileManager() {
-        this.tileManager = TileManager.create();
+    public TestTileManager(Board board) {
+        this.tileManager = TileManager.create(board);
     }
 
     public TileManager getTileManager() {

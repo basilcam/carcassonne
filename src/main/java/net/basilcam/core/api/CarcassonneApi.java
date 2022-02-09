@@ -26,7 +26,7 @@ public class CarcassonneApi {
         this.players = new ArrayList<>();
         this.handlers = new ArrayList<>();
         this.currentPlayerIndex = 0;
-        this.tileManager = TileManager.create();
+        this.tileManager = TileManager.create(this.board);
         this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
         this.gamePhase = GamePhase.SETUP;
         this.turnState = Optional.empty();

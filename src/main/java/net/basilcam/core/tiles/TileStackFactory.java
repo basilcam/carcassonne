@@ -9,7 +9,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
 
@@ -32,6 +31,7 @@ public enum TileStackFactory {
                 .withBottom(new TileSection(TileSectionType.FIELD))
                 .withRight(new TileSection(TileSectionType.ROAD))
                 .addCenter(new TileSection(TileSectionType.ROAD))
+                .withCoatOfArms(false)
                 .build();
     }
 
@@ -73,7 +73,8 @@ public enum TileStackFactory {
                         .withTop(JsonTileConfig.convertTypeNameToTileSection(jsonTile.topSection))
                         .withLeft(JsonTileConfig.convertTypeNameToTileSection(jsonTile.leftSection))
                         .withBottom(JsonTileConfig.convertTypeNameToTileSection(jsonTile.bottomSection))
-                        .withRight(JsonTileConfig.convertTypeNameToTileSection(jsonTile.rightSection));
+                        .withRight(JsonTileConfig.convertTypeNameToTileSection(jsonTile.rightSection))
+                        .withCoatOfArms(jsonTile.hasCoatOfArms);
                 for (String typeName : jsonTile.centerSections) {
                     builder.addCenter(JsonTileConfig.convertTypeNameToTileSection(typeName));
                 }

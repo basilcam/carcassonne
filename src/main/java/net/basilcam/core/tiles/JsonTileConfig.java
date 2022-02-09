@@ -16,6 +16,7 @@ public class JsonTileConfig {
         String bottomSection;
         String rightSection;
         String[] centerSections;
+        boolean hasCoatOfArms;
     }
 
     static class JsonTileStack {

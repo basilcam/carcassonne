@@ -15,6 +15,7 @@ import java.util.*;
 public class GraphFeature implements Feature {
     @VisibleForTesting public static final int ROAD_POINTS_PER_TILE = 1;
     @VisibleForTesting public static final int CITY_POINTS_PER_TILE = 2;
+    @VisibleForTesting public static final int COAT_OF_ARMS_POINTS_PER_TILE = 2;
     private final TileManager tileManager;
     private final Map<TileSection, GraphFeatureNode> featureNodes;
     private final TileSectionType type;
@@ -63,11 +64,13 @@ public class GraphFeature implements Feature {
                 meeple.removeFromTileSection();
                 tileSection.removeMeeple();
             }
-            tiles.add(tileManager.getTileFromSection(tileSection));
+            Tile tile = tileManager.getTileFromSection(tileSection);
+            tiles.add(tile);
         }
 
-        int tileCount = tiles.size();
-        int score = tileCount * (this.type == TileSectionType.CITY ? CITY_POINTS_PER_TILE : ROAD_POINTS_PER_TILE);
+        int score = this.type == TileSectionType.CITY
+                ? tiles.size() * CITY_POINTS_PER_TILE + (int) tiles.stream().filter(Tile::hasCoatOfArms).count() * CITY_POINTS_PER_TILE
+                : tiles.size() * ROAD_POINTS_PER_TILE;
 
         int maxMeepleCount = 0;
         List<Player> playersWithMaxMeepleCount = new ArrayList<>();

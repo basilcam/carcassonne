@@ -27,7 +27,7 @@ class MonasteryFeatureManagerTest {
     @BeforeEach
     public void beforeEach() {
         this.board = new Board();
-        this.tileManager = new TestTileManager();
+        this.tileManager = new TestTileManager(this.board);
         this.featureManager = new MonasteryFeatureManager(this.board);
         this.player = Player.createPlayer("cam");
     }
