@@ -21,8 +21,6 @@ public class CarcassonneApi {
     private Optional<TurnState> turnState;
     private TileManager tileManager;
 
-    // todo: some of these callbacks are unnecessary
-
     public CarcassonneApi() {
         this.board = new Board();
         this.players = new ArrayList<>();
@@ -48,19 +46,18 @@ public class CarcassonneApi {
         this.handlers.add(handler);
     }
 
-    public void addPlayer(String name) {
+    public boolean addPlayer(String name) {
         if (this.gamePhase != GamePhase.SETUP) {
             throw new IllegalStateException("can only add player when in game setup");
         }
         if (this.players.size() >= 5) {
             this.handlers.forEach(handler -> handler.handleError("must have only 2-5 players"));
-            return;
+            return false;
         }
 
         Player player = Player.createPlayer(name);
         this.players.add(player);
-
-        this.handlers.forEach(handler -> handler.playerAdded(player));
+        return true;
     }
 
     public void removePlayer(Player player) {
@@ -72,7 +69,6 @@ public class CarcassonneApi {
         }
 
         this.players.remove(player);
-        this.handlers.forEach(handler -> handler.playerRemoved(player));
     }
 
     public void startGame() {
@@ -110,7 +106,7 @@ public class CarcassonneApi {
         this.handlers.forEach(handler -> handler.nextTurn(this.turnState.get().getCurrentPlayer()));
     }
 
-    public void placeTile(Tile tile, int xPosition, int yPosition) {
+    public boolean placeTile(Tile tile, int xPosition, int yPosition) {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException("can only place tile when game is running");
         }
@@ -118,36 +114,34 @@ public class CarcassonneApi {
             throw new IllegalStateException("can only place one tile per turn");
         }
         if (!PlacementValidator.isValid(this.board, xPosition, yPosition, tile)) {
-            // todo: call handler
-            return;
+            return false;
         }
 
         this.board.placeTile(tile, xPosition, yPosition);
 
         this.featureManager.updateFeatures(tile, xPosition, yPosition);
 
-        this.handlers.forEach(handler -> handler.tilePlaced(tile, xPosition, yPosition));
+        return true;
     }
 
-    public void placeMeeple(Tile tile, TileSection tileSection, Meeple meeple) {
+    public boolean placeMeeple(Tile tile, TileSection tileSection, Meeple meeple) {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException("can only place meeples when game is running");
         }
         if (this.turnState.isEmpty() || this.turnState.get().hasPlacedMeeple()) {
             throw new IllegalStateException("can only place one meeple per turn");
         }
-        if (!this.featureManager.canPlaceMeeple(tile, tileSection)) {
-            // todo: call handler
-            return;
-        }
         if (!meeple.getOwner().equals(this.turnState.get().getCurrentPlayer())) {
             throw new IllegalStateException("can only place meeple belonging to player who's turn it is");
+        }
+        if (!this.featureManager.canPlaceMeeple(tile, tileSection)) {
+            return false;
         }
 
         tileSection.placeMeeple(meeple);
         meeple.setTileSection(tileSection);
 
-        this.handlers.forEach(handler -> handler.meeplePlaced(tileSection, meeple));
+        return true;
     }
 
     public void scoreFeatures() {
