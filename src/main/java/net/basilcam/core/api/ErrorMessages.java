@@ -24,6 +24,7 @@ public enum ErrorMessages {
 
     public static final String PLACE_MEEPLE_WRONG_PHASE = API_ERROR + "can only place meeple in playing phase";
     public static final String PLACE_MEEPLE_ALREADY_PLACED = API_ERROR + "can only place 1 meeple per turn";
+    public static final String PLACE_MEEPLE_NO_TILE = API_ERROR + "can only place meeple on just placed tile";
     public static final String PLACE_MEEPLE_ALREADY_SCORED = API_ERROR + "can only place meeple before scoring";
     public static final String PLACE_MEEPLE_NO_MORE = API_ERROR + "no available meeples for player";
 

@@ -23,7 +23,7 @@ public class CarcassonneApi {
     private final CompositeFeatureManager featureManager;
 
     private GamePhase gamePhase;
-    private Optional<TurnState> turnState;
+    private TurnState turnState;
 
     public CarcassonneApi() {
         this(new TileManager());
@@ -37,7 +37,7 @@ public class CarcassonneApi {
         this.board = new Board(this.tileManager.getStartTile());
         this.gamePhase = GamePhase.SETUP;
         this.featureManager = new CompositeFeatureManager(this.playerManager, this.tileManager, this.board);
-        this.turnState = Optional.empty();
+        this.turnState = null;
     }
 
     public void register(CarcassonneHandler handler) {
@@ -74,7 +74,7 @@ public class CarcassonneApi {
         }
 
         this.gamePhase = GamePhase.PLAYING;
-        this.turnState = Optional.of(new TurnState());
+        this.turnState = new TurnState();
         this.handlers.forEach(CarcassonneHandler::gameStarted);
         this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer()));
     }
@@ -83,11 +83,10 @@ public class CarcassonneApi {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException(ErrorMessages.NEXT_TURN_WRONG_PHASE);
         }
-        assert this.turnState.isPresent();
-        if (!this.turnState.get().hasPlacedTile()) {
+        if (!this.turnState.hasPlacedTile()) {
             throw new IllegalStateException(ErrorMessages.NEXT_TURN_NO_TILE_PLACED);
         }
-        if (!this.turnState.get().hasScored()) {
+        if (!this.turnState.hasScored()) {
             throw new IllegalStateException(ErrorMessages.NEXT_TURN_NOT_SCORED);
         }
         if (!this.tileManager.hasMoreTiles()) {
@@ -96,7 +95,7 @@ public class CarcassonneApi {
             return;
         }
 
-        this.turnState.get().nextTurn();
+        this.turnState = new TurnState();
         this.playerManager.nextTurn();
         this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer()));
     }
@@ -105,8 +104,7 @@ public class CarcassonneApi {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException(ErrorMessages.PLACE_TILE_WRONG_PHASE);
         }
-        assert this.turnState.isPresent();
-        if (this.turnState.get().hasPlacedTile()) {
+        if (this.turnState.hasPlacedTile()) {
             throw new IllegalStateException(ErrorMessages.PLACE_TILE_ALREADY_PLACED);
         }
 
@@ -114,7 +112,7 @@ public class CarcassonneApi {
             return false;
         }
 
-        this.turnState.get().placedTile();
+        this.turnState.setLastPlacedTile(tile);
 
         this.board.placeTile(tile, xPosition, yPosition);
 
@@ -127,11 +125,13 @@ public class CarcassonneApi {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_WRONG_PHASE);
         }
-        assert this.turnState.isPresent();
-        if (this.turnState.get().hasPlacedMeeple()) {
+        if (!this.turnState.hasPlacedTile() || !this.turnState.getLastPlacedTile().equals(tile)) {
+            throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_NO_TILE);
+        }
+        if (this.turnState.hasPlacedMeeple()) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_ALREADY_PLACED);
         }
-        if (this.turnState.get().hasScored()) {
+        if (this.turnState.hasScored()) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_ALREADY_SCORED);
         }
 
@@ -140,13 +140,11 @@ public class CarcassonneApi {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_NO_MORE);
         }
 
-        // todo: only place meeple on tile just placed
-
         if (!this.featureManager.canPlaceMeeple(tile, tileSection)) {
             return false;
         }
 
-        this.turnState.get().placedMeeple();
+        this.turnState.placedMeeple();
         tileSection.placeMeeple(meeple.get());
 
         return true;
@@ -156,14 +154,13 @@ public class CarcassonneApi {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException(ErrorMessages.SCORE_WRONG_PHASE);
         }
-        assert this.turnState.isPresent();
-        if (!this.turnState.get().hasPlacedTile()) {
+        if (!this.turnState.hasPlacedTile()) {
             throw new IllegalStateException(ErrorMessages.SCORE_NO_TILE_PLACED);
         }
 
         this.featureManager.scoreFeatures();
 
-        this.turnState.get().scored();
+        this.turnState.scored();
 
         for (Player player : this.playerManager.getPlayers()) {
             this.handlers.forEach(handler -> handler.scoreUpdate(player));
