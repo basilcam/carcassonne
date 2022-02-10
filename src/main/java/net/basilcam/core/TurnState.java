@@ -35,8 +35,16 @@ public class TurnState {
         return this.hasPlacedTile;
     }
 
+    public void placedTile() {
+        this.hasPlacedTile = true;
+    }
+
     public boolean hasPlacedMeeple() {
         return this.hasPlacedMeeple;
+    }
+
+    public void placedMeeple() {
+        this.hasPlacedMeeple = true;
     }
 
     public Player getCurrentPlayer() {
