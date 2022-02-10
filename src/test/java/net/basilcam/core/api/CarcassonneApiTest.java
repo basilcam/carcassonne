@@ -1,6 +1,5 @@
 package net.basilcam.core.api;
 
-import net.basilcam.core.Board;
 import net.basilcam.core.Player;
 import net.basilcam.core.tiles.TestTileManager;
 import net.basilcam.core.tiles.Tile;
@@ -19,11 +18,9 @@ class CarcassonneApiTest {
 
     @BeforeEach
     public void beforeEach() {
-        api = new CarcassonneApi();
-        api.register(handler);
-        // todo: using this to draw tiles won't work since actual tileManager won't have tile section mapping
-        // todo: probably just inject it
         tileManager = new TestTileManager();
+        api = new CarcassonneApi(tileManager.getTileManager());
+        api.register(handler);
     }
 
     @Test
@@ -40,7 +37,7 @@ class CarcassonneApiTest {
     @Test
     public void shouldNotRemovePlayer_gameIsNotInSetupPhase() {
         api.addPlayer("cam");
-        Player mina = api.addPlayer("mina");
+        Player mina = api.addPlayer("mina"); // my cat's name =^._.^=
         api.startGame();
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.removePlayer(mina));
@@ -101,31 +98,57 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceTile_gameNotInPlayingPhase() {
+        api.addPlayer("cam");
 
+        Tile tile10 = tileManager.drawTileById(10);
+        tile10.rotateClockwise();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.placeTile(tile10, 1, 0));
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.PLACE_TILE_WRONG_PHASE);
     }
 
     @Test
     public void shouldNotPlaceTile_tileAlreadyPlacedForTurn() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        tile10.rotateClockwise();
+        assertThat(api.placeTile(tile10, 1, 0)).isTrue();
+
+        Tile tile22 = tileManager.drawTileById(22);
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.placeTile(tile22, 2, 0));
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.PLACE_TILE_ALREADY_PLACED);
     }
 
     @Test
     public void shouldNotPlaceTile_tilePlacementInvalid() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        assertThat(api.placeTile(tile10, 1, 0)).isFalse();
     }
 
     @Test
     public void shouldPlaceTile_previousPlacementInvalid_currentPlacementValid() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        assertThat(api.placeTile(tile10, 1, 0)).isFalse();
+
+        tile10.rotateClockwise();
+        assertThat(api.placeTile(tile10, 1, 0)).isTrue();
     }
-
-
-
-
 
     @Test
     public void shouldNotPlaceMeeple_gameNotInPlayingPhase() {
-
     }
 
     @Test

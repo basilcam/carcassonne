@@ -5,6 +5,7 @@ import net.basilcam.core.features.CompositeFeatureManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,14 @@ public class CarcassonneApi {
     private Optional<TurnState> turnState;
 
     public CarcassonneApi() {
+        this(new TileManager());
+    }
+
+    @TestOnly
+    public CarcassonneApi(TileManager tileManager) {
         this.handlers = new ArrayList<>();
         this.players = new ArrayList<>();
-        this.tileManager = new TileManager();
+        this.tileManager = tileManager;
         this.board = new Board(this.tileManager.getStartTile());
         this.gamePhase = GamePhase.SETUP;
         this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
