@@ -5,16 +5,10 @@ import net.basilcam.core.tiles.TileSection;
 import java.util.Optional;
 
 public class Meeple {
-    private final Player owner;
-    private Optional<TileSection> tileSection;
+    private Optional<TileSection> tileSection; // todo: we don't actually need this, we just need to know if it's placed or not
 
-    public Meeple(Player owner) {
-        this.owner = owner;
+    public Meeple() {
         this.tileSection = Optional.empty();
-    }
-
-    public Player getOwner() {
-        return this.owner;
     }
 
     public Optional<TileSection> getTileSection() {

@@ -1,24 +1,11 @@
 package net.basilcam.core;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-
 public class TurnState {
-    // todo: remove players from here and into game state
-    private final ImmutableList<Player> players;
-    private int currentPlayerIndex;
-
     private boolean hasPlacedTile;
     private boolean hasPlacedMeeple;
     private boolean hasScored;
 
-    public TurnState(List<Player> players) {
-        assert !players.isEmpty();
-
-        this.players = ImmutableList.copyOf(players);
-        this.currentPlayerIndex = 0;
-
+    public TurnState() {
         this.hasPlacedTile = false;
         this.hasPlacedMeeple = false;
         this.hasScored = false;
@@ -28,11 +15,6 @@ public class TurnState {
         this.hasPlacedTile = false;
         this.hasPlacedMeeple = false;
         this.hasScored = false;
-
-        this.currentPlayerIndex++;
-        if (this.currentPlayerIndex >= this.players.size()) {
-            this.currentPlayerIndex = 0;
-        }
     }
 
     public boolean hasPlacedTile() {
@@ -57,9 +39,5 @@ public class TurnState {
 
     public void scored() {
         this.hasScored = true;
-    }
-
-    public Player getCurrentPlayer() {
-        return this.players.get(this.currentPlayerIndex);
     }
 }

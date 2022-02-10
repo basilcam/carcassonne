@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.basilcam.core.Meeple;
 import net.basilcam.core.Player;
+import net.basilcam.core.PlayerManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
@@ -16,12 +17,14 @@ public class GraphFeature implements Feature {
     @VisibleForTesting public static final int ROAD_POINTS_PER_TILE = 1;
     @VisibleForTesting public static final int CITY_POINTS_PER_TILE = 2;
     @VisibleForTesting public static final int COAT_OF_ARMS_POINTS_PER_TILE = 2;
+    private final PlayerManager playerManager;
     private final TileManager tileManager;
     private final Map<TileSection, GraphFeatureNode> featureNodes;
     private final TileSectionType type;
     private boolean hasBeenScored;
 
-    public GraphFeature(TileManager tileManager, TileSectionType type) {
+    public GraphFeature(PlayerManager playerManager, TileManager tileManager, TileSectionType type) {
+        this.playerManager = playerManager;
         this.tileManager = tileManager;
         this.featureNodes = new HashMap<>();
         this.type = type;
@@ -58,7 +61,7 @@ public class GraphFeature implements Feature {
         for (TileSection tileSection : this.featureNodes.keySet()) {
             if (tileSection.getMeeple().isPresent()) {
                 Meeple meeple = tileSection.getMeeple().get();
-                Player owner = meeple.getOwner();
+                Player owner = this.playerManager.getMeepleOwner(meeple);
                 meeples.put(owner, meeple);
 
                 meeple.removeFromTileSection();

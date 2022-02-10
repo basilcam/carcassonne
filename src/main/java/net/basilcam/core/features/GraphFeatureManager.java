@@ -2,6 +2,7 @@ package net.basilcam.core.features;
 
 import net.basilcam.core.Board;
 import net.basilcam.core.Direction;
+import net.basilcam.core.PlayerManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
@@ -11,13 +12,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class GraphFeatureManager implements FeatureManager {
-    private final Board board;
+    private final PlayerManager playerManager;
     private final TileManager tileManager;
+    private final Board board;
     private final Map<TileSection, GraphFeature> tileSectionToFeature;
 
-    GraphFeatureManager(Board board, TileManager tileManager) {
-        this.board = board;
+    GraphFeatureManager(PlayerManager playerManager, TileManager tileManager, Board board) {
+        this.playerManager = playerManager;
         this.tileManager = tileManager;
+        this.board = board;
         this.tileSectionToFeature = new HashMap<>();
 
         this.board.forEachTile(this::updateFeatures);
@@ -79,7 +82,7 @@ public class GraphFeatureManager implements FeatureManager {
             connectAbuttingNode(abuttingFeature, newNode, abuttingSection, direction.oppositeDirection());
             this.tileSectionToFeature.put(tileSection, abuttingFeature);
         } else {
-            GraphFeature feature = new GraphFeature(tileManager, tileSection.getType());
+            GraphFeature feature = new GraphFeature(playerManager, tileManager, tileSection.getType());
             feature.addNode(newNode);
             this.tileSectionToFeature.put(tileSection, feature);
         }
@@ -118,7 +121,7 @@ public class GraphFeatureManager implements FeatureManager {
                 continue;
             }
 
-            GraphFeature mergedFeature = new GraphFeature(tileManager, centerSection.getType());
+            GraphFeature mergedFeature = new GraphFeature(this.playerManager, this.tileManager, centerSection.getType());
             mergedFeature.merge(connectedFeatures);
             for (TileSection tileSection : mergedFeature.getTileSections()) {
                 this.tileSectionToFeature.put(tileSection, mergedFeature);

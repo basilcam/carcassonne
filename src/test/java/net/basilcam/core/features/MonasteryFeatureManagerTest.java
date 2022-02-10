@@ -19,6 +19,7 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MonasteryFeatureManagerTest {
+    private PlayerManager playerManager;
     private TestTileManager tileManager;
     private Board board;
     private MonasteryFeatureManager featureManager;
@@ -26,10 +27,14 @@ class MonasteryFeatureManagerTest {
 
     @BeforeEach
     public void beforeEach() {
+        this.playerManager = new PlayerManager();
         this.tileManager = new TestTileManager();
         this.board = new Board(this.tileManager.getStartTile());
-        this.featureManager = new MonasteryFeatureManager(this.board);
-        this.player = Player.createPlayer("cam");
+        this.featureManager = new MonasteryFeatureManager(this.playerManager, this.board);
+
+        this.player = new Player("cam");
+        this.playerManager.addPlayer(this.player);
+
     }
 
     @Test

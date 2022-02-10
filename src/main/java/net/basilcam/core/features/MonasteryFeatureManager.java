@@ -2,6 +2,7 @@ package net.basilcam.core.features;
 
 import net.basilcam.core.Board;
 import net.basilcam.core.Pair;
+import net.basilcam.core.PlayerManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
 import net.basilcam.core.tiles.TileSectionType;
@@ -11,10 +12,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MonasteryFeatureManager implements FeatureManager {
+    private final PlayerManager playerManager;
     private final Board board;
     private final Map<Tile, MonasteryFeature> centerTileToFeature;
 
-    public MonasteryFeatureManager(Board board) {
+    public MonasteryFeatureManager(PlayerManager playerManager, Board board) {
+        this.playerManager = playerManager;
         this.board = board;
         this.centerTileToFeature = new HashMap<>();
 
@@ -50,7 +53,7 @@ public class MonasteryFeatureManager implements FeatureManager {
 
         // if tile contains a monastery, add a new feature, add surrounding tiles
         if (MonasteryFeatureManager.containsMonastery(tile)) {
-            MonasteryFeature feature = new MonasteryFeature(tile);
+            MonasteryFeature feature = new MonasteryFeature(this.playerManager, tile);
             this.centerTileToFeature.put(tile, feature);
 
             for (int x = xPosition - 1; x <= xPosition + 1; x++) {

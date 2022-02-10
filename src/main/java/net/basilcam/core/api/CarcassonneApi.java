@@ -17,7 +17,7 @@ public class CarcassonneApi {
 
     private final List<CarcassonneHandler> handlers;
 
-    private final List<Player> players;
+    private final PlayerManager playerManager;
     private final TileManager tileManager;
     private final Board board;
     private final CompositeFeatureManager featureManager;
@@ -32,11 +32,11 @@ public class CarcassonneApi {
     @TestOnly
     public CarcassonneApi(TileManager tileManager) {
         this.handlers = new ArrayList<>();
-        this.players = new ArrayList<>();
+        this.playerManager = new PlayerManager();
         this.tileManager = tileManager;
         this.board = new Board(this.tileManager.getStartTile());
         this.gamePhase = GamePhase.SETUP;
-        this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
+        this.featureManager = new CompositeFeatureManager(this.playerManager, this.tileManager, this.board);
         this.turnState = Optional.empty();
     }
 
@@ -48,12 +48,12 @@ public class CarcassonneApi {
         if (this.gamePhase != GamePhase.SETUP) {
             throw new IllegalStateException(ErrorMessages.ADD_PLAYER_WRONG_PHASE);
         }
-        if (this.players.size() >= MAX_PLAYERS) {
+        if (this.playerManager.getNumberPlayers() >= MAX_PLAYERS) {
             throw new IllegalStateException(ErrorMessages.ADD_PLAYER_TOO_MANY);
         }
 
-        Player player = Player.createPlayer(name);
-        this.players.add(player);
+        Player player = new Player(name);
+        this.playerManager.addPlayer(player);
         return player;
     }
 
@@ -62,21 +62,21 @@ public class CarcassonneApi {
             throw new IllegalStateException(ErrorMessages.REMOVE_PLAYER_WRONG_PHASE);
         }
 
-        this.players.remove(player);
+        this.playerManager.removePlayer(player);
     }
 
     public void startGame() {
         if (this.gamePhase != GamePhase.SETUP) {
             throw new IllegalStateException(ErrorMessages.START_GAME_WRONG_PHASE);
         }
-        if (this.players.size() < MIN_PLAYERS || this.players.size() >= MAX_PLAYERS) {
+        if (this.playerManager.getNumberPlayers() < MIN_PLAYERS || this.playerManager.getNumberPlayers() >= MAX_PLAYERS) {
             throw new IllegalStateException(ErrorMessages.START_GAME_WRONG_PLAYER_COUNT);
         }
 
         this.gamePhase = GamePhase.PLAYING;
-        this.turnState = Optional.of(new TurnState(this.players));
+        this.turnState = Optional.of(new TurnState());
         this.handlers.forEach(CarcassonneHandler::gameStarted);
-        this.handlers.forEach(handler -> handler.turnStarted(this.turnState.get().getCurrentPlayer()));
+        this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer()));
     }
 
     public void nextTurn() {
@@ -97,7 +97,8 @@ public class CarcassonneApi {
         }
 
         this.turnState.get().nextTurn();
-        this.handlers.forEach(handler -> handler.turnStarted(this.turnState.get().getCurrentPlayer()));
+        this.playerManager.nextTurn();
+        this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer()));
     }
 
     public boolean placeTile(Tile tile, int xPosition, int yPosition) {
@@ -122,7 +123,7 @@ public class CarcassonneApi {
         return true;
     }
 
-    public boolean placeMeeple(Tile tile, TileSection tileSection, Meeple meeple) {
+    public boolean placeMeeple(Tile tile, TileSection tileSection) {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_WRONG_PHASE);
         }
@@ -133,10 +134,10 @@ public class CarcassonneApi {
         if (this.turnState.get().hasScored()) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_ALREADY_SCORED);
         }
-        if (!meeple.getOwner().equals(this.turnState.get().getCurrentPlayer())) {
-            throw new IllegalStateException("can only place meeple belonging to player who's turn it is");
-            // todo: i don't like that the meeple is passed in. should just grab it from the current player
-            // throw an error if there are no more meeples
+
+        Optional<Meeple> meeple = this.playerManager.getCurrentPlayer().getMeeple();
+        if (meeple.isEmpty()) {
+            throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_NO_MORE);
         }
 
         // todo: only place meeple on tile just placed
@@ -146,9 +147,7 @@ public class CarcassonneApi {
         }
 
         this.turnState.get().placedMeeple();
-
-        tileSection.placeMeeple(meeple);
-        meeple.setTileSection(tileSection);
+        tileSection.placeMeeple(meeple.get());
 
         return true;
     }
@@ -166,7 +165,7 @@ public class CarcassonneApi {
 
         this.turnState.get().scored();
 
-        for (Player player : this.players) {
+        for (Player player : this.playerManager.getPlayers()) {
             this.handlers.forEach(handler -> handler.scoreUpdate(player));
         }
     }

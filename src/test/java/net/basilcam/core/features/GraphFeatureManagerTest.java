@@ -1,9 +1,6 @@
 package net.basilcam.core.features;
 
-import net.basilcam.core.Board;
-import net.basilcam.core.Meeple;
-import net.basilcam.core.PlacementValidator;
-import net.basilcam.core.Player;
+import net.basilcam.core.*;
 import net.basilcam.core.tiles.*;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +12,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GraphFeatureManagerTest {
+    private PlayerManager playerManager;
     private TestTileManager tileManager;
     private Board board;
     private GraphFeatureManager featureManager;
@@ -23,11 +21,15 @@ public class GraphFeatureManagerTest {
 
     @BeforeEach
     public void beforeEach() {
+        this.playerManager = new PlayerManager();
         this.tileManager = new TestTileManager();
         this.board = new Board(this.tileManager.getStartTile());
-        this.featureManager = new GraphFeatureManager(this.board, this.tileManager.getTileManager());
-        this.player1 = Player.createPlayer("cam");
-        this.player2 = Player.createPlayer("basil");
+        this.featureManager = new GraphFeatureManager(this.playerManager, this.tileManager.getTileManager(), this.board);
+
+        this.player1 = new Player("cam");
+        this.playerManager.addPlayer(this.player1);
+        this.player2 = new Player("basil");
+        this.playerManager.addPlayer(this.player2);
     }
 
     @Test

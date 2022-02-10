@@ -1,8 +1,8 @@
 package net.basilcam.core;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import com.google.common.collect.Lists;
+
+import java.util.*;
 
 public class Player {
     private static final int MEEPLE_PER_PLAYER = 7;
@@ -13,10 +13,10 @@ public class Player {
 
     // todo: i don't like the player owns meeple, and meeple owns player
 
-    public static Player createPlayer(String name) {
-        Player player = new Player(name);
-        player.createMeeples();
-        return player;
+    public Player(String name) {
+        this.name = name;
+        this.score = 0;
+        this.meeples = Player.createMeeples();
     }
 
     public String getName() {
@@ -38,6 +38,10 @@ public class Player {
             }
         }
         return Optional.empty();
+    }
+
+    public Collection<Meeple> getMeeples() {
+        return Arrays.asList(this.meeples);
     }
 
     @Override
@@ -67,15 +71,11 @@ public class Player {
                 '}';
     }
 
-    private Player(String name) {
-        this.name = name;
-        this.score = 0;
-        this.meeples = new Meeple[MEEPLE_PER_PLAYER];
-    }
-
-    private void createMeeples() {
+    private static Meeple[] createMeeples() {
+        Meeple[] meeples = new Meeple[MEEPLE_PER_PLAYER];
         for (int i = 0; i < MEEPLE_PER_PLAYER; i++) {
-            this.meeples[i] = new Meeple(this);
+            meeples[i] = new Meeple();
         }
+        return meeples;
     }
 }

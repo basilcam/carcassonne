@@ -1,9 +1,6 @@
 package net.basilcam.core.features;
 
-import net.basilcam.core.Board;
-import net.basilcam.core.Meeple;
-import net.basilcam.core.PlacementValidator;
-import net.basilcam.core.Player;
+import net.basilcam.core.*;
 import net.basilcam.core.tiles.*;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +12,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CompositeFeatureManagerTest {
+    private PlayerManager playerManager;
     private TestTileManager tileManager;
     private Board board;
     private CompositeFeatureManager featureManager;
@@ -22,10 +20,13 @@ class CompositeFeatureManagerTest {
 
     @BeforeEach
     public void beforeEach() {
+        this.playerManager = new PlayerManager();
         this.tileManager = new TestTileManager();
         this.board = new Board(this.tileManager.getStartTile());
-        this.featureManager = new CompositeFeatureManager(this.board, this.tileManager.getTileManager());
-        this.player = Player.createPlayer("cam");
+        this.featureManager = new CompositeFeatureManager(this.playerManager, this.tileManager.getTileManager(), this.board);
+
+        this.player = new Player("cam");
+        this.playerManager.addPlayer(this.player);
     }
 
     @Test

@@ -2,6 +2,7 @@ package net.basilcam.core.features;
 
 import com.google.common.collect.Lists;
 import net.basilcam.core.Board;
+import net.basilcam.core.PlayerManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
@@ -12,10 +13,10 @@ import java.util.*;
 public class CompositeFeatureManager implements FeatureManager {
     private final List<FeatureManager> featureManagers;
 
-    public CompositeFeatureManager(Board board, TileManager tileManager) {
+    public CompositeFeatureManager(PlayerManager playerManager, TileManager tileManager, Board board) {
         this.featureManagers = Lists.newArrayList(
-                new GraphFeatureManager(board, tileManager),
-                new MonasteryFeatureManager(board));
+                new GraphFeatureManager(playerManager, tileManager, board),
+                new MonasteryFeatureManager(playerManager, board));
     }
 
     @Override
