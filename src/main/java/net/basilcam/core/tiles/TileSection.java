@@ -18,10 +18,13 @@ public class TileSection {
     }
 
     public void placeMeeple(Meeple meeple) {
+        meeple.placeMeeple();
         this.meeple = Optional.of(meeple);
     }
 
     public void removeMeeple() {
+        assert this.meeple.isPresent();
+        this.meeple.get().removeMeeple();
         this.meeple = Optional.empty();
     }
 

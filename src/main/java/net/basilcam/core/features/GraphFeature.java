@@ -64,7 +64,6 @@ public class GraphFeature implements Feature {
                 Player owner = this.playerManager.getMeepleOwner(meeple);
                 meeples.put(owner, meeple);
 
-                meeple.removeFromTileSection();
                 tileSection.removeMeeple();
             }
             Tile tile = tileManager.getTileFromSection(tileSection);

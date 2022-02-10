@@ -390,7 +390,6 @@ public class GraphFeatureManagerTest {
         assertThat(this.featureManager.canPlaceMeeple(tile, tileSection)).isTrue();
 
         tileSection.placeMeeple(meeple.get());
-        meeple.get().setTileSection(tileSection);
     }
 
     private void assertFeatureCount(int count) {

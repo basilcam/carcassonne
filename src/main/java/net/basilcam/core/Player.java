@@ -1,7 +1,5 @@
 package net.basilcam.core;
 
-import com.google.common.collect.Lists;
-
 import java.util.*;
 
 public class Player {
@@ -10,8 +8,6 @@ public class Player {
     private final String name;
     private int score;
     private final Meeple[] meeples;
-
-    // todo: i don't like the player owns meeple, and meeple owns player
 
     public Player(String name) {
         this.name = name;
@@ -33,7 +29,7 @@ public class Player {
 
     public Optional<Meeple> getMeeple() {
         for (Meeple meeple : this.meeples) {
-            if (meeple.getTileSection().isEmpty()) {
+            if (!meeple.isPlaced()) {
                 return Optional.of(meeple);
             }
         }

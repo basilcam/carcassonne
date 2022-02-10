@@ -61,7 +61,7 @@ public class MonasteryFeature implements Feature {
             if (section.getMeeple().isPresent()) {
                 Meeple meeple = section.getMeeple().get();
                 Player player = this.playerManager.getMeepleOwner(meeple);
-                meeple.removeFromTileSection();
+                section.removeMeeple();
                 player.addScore(POINTS_PER_MONASTERY);
             }
         }
