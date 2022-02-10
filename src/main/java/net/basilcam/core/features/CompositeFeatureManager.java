@@ -26,9 +26,9 @@ public class CompositeFeatureManager implements FeatureManager {
     }
 
     @Override
-    public void clear() {
+    public void reset() {
         for (FeatureManager featureManager : featureManagers) {
-            featureManager.clear();
+            featureManager.reset();
         }
     }
 

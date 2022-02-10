@@ -11,35 +11,33 @@ import java.util.List;
 import java.util.Optional;
 
 public class CarcassonneApi {
-    private static final int MAX_PLAYERS = 5;
-    private static final int MIN_PLAYERS = 2;
+    public static final int MAX_PLAYERS = 5;
+    public static final int MIN_PLAYERS = 2;
+
     private final Board board;
     private final List<Player> players;
     private final List<CarcassonneHandler> handlers;
-    private CompositeFeatureManager featureManager;
+    private final CompositeFeatureManager featureManager;
 
     private GamePhase gamePhase;
-    private int currentPlayerIndex;
     private Optional<TurnState> turnState;
-    private TileManager tileManager;
+    private final TileManager tileManager;
 
     public CarcassonneApi() {
         this.board = new Board();
         this.players = new ArrayList<>();
         this.handlers = new ArrayList<>();
-        this.currentPlayerIndex = 0;
         this.tileManager = TileManager.create(this.board);
         this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
-        this.gamePhase = GamePhase.SETUP;
+        this.gamePhase = GamePhase.INVALID;
         this.turnState = Optional.empty();
     }
 
     public void newGame() {
         this.players.clear();
-        this.currentPlayerIndex = 0;
-        this.board.clear();
+        this.board.reset();
         this.gamePhase = GamePhase.SETUP;
-        this.featureManager.clear();
+        this.featureManager.reset();
         this.turnState = Optional.empty();
         this.tileManager.reset();
     }
@@ -48,26 +46,22 @@ public class CarcassonneApi {
         this.handlers.add(handler);
     }
 
-    public boolean addPlayer(String name) {
+    public Player addPlayer(String name) {
         if (this.gamePhase != GamePhase.SETUP) {
-            throw new IllegalStateException("can only add player when in game setup");
+            throw new IllegalStateException(ErrorMessages.ADD_PLAYER_WRONG_PHASE);
         }
         if (this.players.size() >= MAX_PLAYERS) {
-            this.handlers.forEach(handler -> handler.handleError("must have only 2-5 players"));
-            return false;
+            throw new IllegalStateException(ErrorMessages.ADD_PLAYER_TOO_MANY);
         }
 
         Player player = Player.createPlayer(name);
         this.players.add(player);
-        return true;
+        return player;
     }
 
     public void removePlayer(Player player) {
         if (this.gamePhase != GamePhase.SETUP) {
-            throw new IllegalStateException("can only remove player when in game setup");
-        }
-        if (!this.players.contains(player)) {
-            throw new IllegalStateException("attempted to remove player that does not exist");
+            throw new IllegalStateException(ErrorMessages.REMOVE_PLAYER_WRONG_PHASE);
         }
 
         this.players.remove(player);
@@ -75,24 +69,28 @@ public class CarcassonneApi {
 
     public void startGame() {
         if (this.gamePhase != GamePhase.SETUP) {
-            throw new IllegalStateException("can only start game when in game setup");
+            throw new IllegalStateException(ErrorMessages.START_GAME_WRONG_PHASE);
         }
         if (this.players.size() < MIN_PLAYERS || this.players.size() >= MAX_PLAYERS) {
-            this.handlers.forEach(handler -> handler.handleError("must have 2-5 players"));
-            return;
+            throw new IllegalStateException(ErrorMessages.START_GAME_WRONG_PLAYER_COUNT);
         }
 
         this.gamePhase = GamePhase.PLAYING;
         this.turnState = Optional.of(new TurnState(this.players));
         this.handlers.forEach(CarcassonneHandler::gameStarted);
+        this.handlers.forEach(handler -> handler.turnStarted(this.turnState.get().getCurrentPlayer()));
     }
 
     public void nextTurn() {
         if (this.gamePhase != GamePhase.PLAYING) {
-            throw new IllegalStateException("can only take turn when game is running");
+            throw new IllegalStateException(ErrorMessages.NEXT_TURN_WRONG_PHASE);
         }
-        if (this.turnState.isEmpty() || !this.turnState.get().hasPlacedTile()) {
-            throw new IllegalStateException("must place tile before moving to next turn");
+        assert this.turnState.isPresent();
+        if (!this.turnState.get().hasPlacedTile()) {
+            throw new IllegalStateException(ErrorMessages.NEXT_TURN_NO_TILE_PLACED);
+        }
+        if (!this.turnState.get().hasScored()) {
+            throw new IllegalStateException(ErrorMessages.NEXT_TURN_NOT_SCORED);
         }
         if (!this.tileManager.hasMoreTiles()) {
             this.gamePhase = GamePhase.ENDED;
@@ -100,22 +98,19 @@ public class CarcassonneApi {
             return;
         }
 
-        this.currentPlayerIndex++;
-        if (this.currentPlayerIndex > this.players.size()) {
-            this.currentPlayerIndex = 0;
-        }
         this.turnState.get().nextTurn();
-        this.handlers.forEach(handler -> handler.nextTurn(this.turnState.get().getCurrentPlayer()));
+        this.handlers.forEach(handler -> handler.turnStarted(this.turnState.get().getCurrentPlayer()));
     }
 
     public boolean placeTile(Tile tile, int xPosition, int yPosition) {
         if (this.gamePhase != GamePhase.PLAYING) {
-            throw new IllegalStateException("can only place tile when game is running");
+            throw new IllegalStateException(ErrorMessages.PLACE_TILE_WRONG_PHASE);
         }
         assert this.turnState.isPresent();
         if (this.turnState.get().hasPlacedTile()) {
-            throw new IllegalStateException("can only place one tile per turn");
+            throw new IllegalStateException(ErrorMessages.PLACE_TILE_ALREADY_PLACED);
         }
+
         if (!PlacementValidator.isValid(this.board, xPosition, yPosition, tile)) {
             return false;
         }
@@ -131,18 +126,22 @@ public class CarcassonneApi {
 
     public boolean placeMeeple(Tile tile, TileSection tileSection, Meeple meeple) {
         if (this.gamePhase != GamePhase.PLAYING) {
-            throw new IllegalStateException("can only place meeples when game is running");
+            throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_WRONG_PHASE);
         }
         assert this.turnState.isPresent();
         if (this.turnState.get().hasPlacedMeeple()) {
-            throw new IllegalStateException("can only place one meeple per turn");
+            throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_ALREADY_PLACED);
+        }
+        if (this.turnState.get().hasScored()) {
+            throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_ALREADY_SCORED);
         }
         if (!meeple.getOwner().equals(this.turnState.get().getCurrentPlayer())) {
             throw new IllegalStateException("can only place meeple belonging to player who's turn it is");
+            // todo: i don't like that the meeple is passed in. should just grab it from the current player
+            // throw an error if there are no more meeples
         }
 
         // todo: only place meeple on tile just placed
-
 
         if (!this.featureManager.canPlaceMeeple(tile, tileSection)) {
             return false;
@@ -158,14 +157,16 @@ public class CarcassonneApi {
 
     public void scoreFeatures() {
         if (this.gamePhase != GamePhase.PLAYING) {
-            throw new IllegalStateException("can only score features when actually playing the game");
+            throw new IllegalStateException(ErrorMessages.SCORE_WRONG_PHASE);
         }
         assert this.turnState.isPresent();
         if (!this.turnState.get().hasPlacedTile()) {
-            throw new IllegalStateException("can only score features after placing tile");
+            throw new IllegalStateException(ErrorMessages.SCORE_NO_TILE_PLACED);
         }
 
         this.featureManager.scoreFeatures();
+
+        this.turnState.get().scored();
 
         for (Player player : this.players) {
             this.handlers.forEach(handler -> handler.scoreUpdate(player));

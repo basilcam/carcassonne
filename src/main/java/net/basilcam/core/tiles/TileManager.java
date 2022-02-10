@@ -44,7 +44,7 @@ public class TileManager {
     }
 
     public boolean hasMoreTiles() {
-        return this.tiles.isEmpty();
+        return !this.tiles.isEmpty();
     }
 
     public Tile getTileFromSection(TileSection tileSection) {

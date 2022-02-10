@@ -18,7 +18,7 @@ public class MonasteryFeatureManager implements FeatureManager {
         this.board = board;
         this.centerTileToFeature = new HashMap<>();
 
-        this.board.forEachTile(this::updateFeatures);
+        reset();
     }
 
     @Override
@@ -71,8 +71,9 @@ public class MonasteryFeatureManager implements FeatureManager {
     }
 
     @Override
-    public void clear() {
+    public void reset() {
         this.centerTileToFeature.clear();
+        this.board.forEachTile(this::updateFeatures);
     }
 
     @Override

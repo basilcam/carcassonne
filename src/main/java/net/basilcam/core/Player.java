@@ -1,5 +1,6 @@
 package net.basilcam.core;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -9,6 +10,8 @@ public class Player {
     private final String name;
     private int score;
     private final Meeple[] meeples;
+
+    // todo: i don't like the player owns meeple, and meeple owns player
 
     public static Player createPlayer(String name) {
         Player player = new Player(name);
@@ -53,6 +56,15 @@ public class Player {
     @Override
     public int hashCode() {
         return Objects.hash(this.name, this.score);
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", score=" + score +
+                ", meeples=" + Arrays.toString(meeples) +
+                '}';
     }
 
     private Player(String name) {

@@ -5,7 +5,7 @@ import net.basilcam.core.Player;
 public interface CarcassonneHandler {
     void gameStarted();
 
-    void nextTurn(Player player);
+    void turnStarted(Player player);
 
     void scoreUpdate(Player player);
 

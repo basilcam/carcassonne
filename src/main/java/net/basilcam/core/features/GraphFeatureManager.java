@@ -20,7 +20,7 @@ public class GraphFeatureManager implements FeatureManager {
         this.tileManager = tileManager;
         this.tileSectionToFeature = new HashMap<>();
 
-        this.board.forEachTile(this::updateFeatures);
+        reset();
     }
 
     @Override
@@ -33,8 +33,9 @@ public class GraphFeatureManager implements FeatureManager {
     }
 
     @Override
-    public void clear() {
+    public void reset() {
         this.tileSectionToFeature.clear();
+        this.board.forEachTile(this::updateFeatures);
     }
 
     @Override

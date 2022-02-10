@@ -8,7 +8,7 @@ public abstract class BaseCarcassonneHandler implements CarcassonneHandler {
     }
 
     @Override
-    public void nextTurn(Player player) {
+    public void turnStarted(Player player) {
     }
 
     @Override

@@ -9,7 +9,7 @@ public interface FeatureManager {
 
     void updateFeatures(Tile tile, int xPosition, int yPosition);
 
-    void clear();
+    void reset();
 
     Collection<? extends Feature> getFeatures();
 

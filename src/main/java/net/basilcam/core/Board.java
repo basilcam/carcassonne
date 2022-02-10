@@ -18,7 +18,7 @@ public class Board {
 
     public Board() {
         this.tiles = HashBasedTable.create();
-        this.tiles.put(0, 0, TileStackFactory.createStartTile());
+        reset();
     }
 
     public Optional<Tile> getTile(int xPosition, int yPosition) {
@@ -54,8 +54,9 @@ public class Board {
         }
     }
 
-    public void clear() {
+    public void reset() {
         this.tiles.clear();
+        this.tiles.put(0, 0, TileStackFactory.createStartTile());
     }
 
     public interface TileConsumer {
