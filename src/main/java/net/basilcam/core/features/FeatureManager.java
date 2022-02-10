@@ -9,8 +9,6 @@ public interface FeatureManager {
 
     void updateFeatures(Tile tile, int xPosition, int yPosition);
 
-    void reset();
-
     Collection<? extends Feature> getFeatures();
 
     boolean canPlaceMeeple(Tile tile, TileSection section);

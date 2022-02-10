@@ -23,19 +23,11 @@ class CarcassonneApiTest {
         api.register(handler);
         // todo: using this to draw tiles won't work since actual tileManager won't have tile section mapping
         // todo: probably just inject it
-        tileManager = new TestTileManager(new Board());
-    }
-
-    @Test
-    public void shouldNotAddPlayer_gameIsNotInSetupPhase() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.addPlayer("cam"));
-
-        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.ADD_PLAYER_WRONG_PHASE);
+        tileManager = new TestTileManager();
     }
 
     @Test
     public void shouldNotAddPlayer_tooManyPlayers() {
-        api.newGame();
         for (int i = 0; i < CarcassonneApi.MAX_PLAYERS; i++) {
             api.addPlayer("cam" + i);
         }
@@ -47,7 +39,6 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotRemovePlayer_gameIsNotInSetupPhase() {
-        api.newGame();
         api.addPlayer("cam");
         Player mina = api.addPlayer("mina");
         api.startGame();
@@ -58,7 +49,6 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldRemovePlayer() {
-        api.newGame();
         api.addPlayer("cam");
         Player mina = api.addPlayer("mina");
 
@@ -66,14 +56,7 @@ class CarcassonneApiTest {
     }
 
     @Test
-    public void shouldNotStartGame_gameIsNotInSetupPhase() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.startGame());
-        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.START_GAME_WRONG_PHASE);
-    }
-
-    @Test
     public void shouldNotStartGame_tooFewPlayers() {
-        api.newGame();
         api.addPlayer("cam");
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.startGame());
@@ -82,7 +65,6 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldStartGame_validNumberOfPlayers() {
-        api.newGame();
         api.addPlayer("cam");
         api.addPlayer("mina");
         api.startGame();
@@ -90,7 +72,6 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotTakeTurn_gameIsNotInPlayingPhase() {
-        api.newGame();
         api.addPlayer("cam");
         api.addPlayer("mina");
 
@@ -100,7 +81,6 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldCycleThroughTurnForEachPlayer() {
-        api.newGame();
         Player cam = api.addPlayer("cam");
         Player mina = api.addPlayer("mina");
         api.startGame();

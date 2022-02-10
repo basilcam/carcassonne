@@ -15,16 +15,16 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GraphFeatureManagerTest {
-    private Board board;
     private TestTileManager tileManager;
+    private Board board;
     private GraphFeatureManager featureManager;
     private Player player1;
     private Player player2;
 
     @BeforeEach
     public void beforeEach() {
-        this.board = new Board();
-        this.tileManager = new TestTileManager(this.board);
+        this.tileManager = new TestTileManager();
+        this.board = new Board(this.tileManager.getStartTile());
         this.featureManager = new GraphFeatureManager(this.board, this.tileManager.getTileManager());
         this.player1 = Player.createPlayer("cam");
         this.player2 = Player.createPlayer("basil");

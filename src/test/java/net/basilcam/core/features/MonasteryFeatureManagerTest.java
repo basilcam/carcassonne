@@ -19,15 +19,15 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MonasteryFeatureManagerTest {
-    private Board board;
     private TestTileManager tileManager;
+    private Board board;
     private MonasteryFeatureManager featureManager;
     private Player player;
 
     @BeforeEach
     public void beforeEach() {
-        this.board = new Board();
-        this.tileManager = new TestTileManager(this.board);
+        this.tileManager = new TestTileManager();
+        this.board = new Board(this.tileManager.getStartTile());
         this.featureManager = new MonasteryFeatureManager(this.board);
         this.player = Player.createPlayer("cam");
     }

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 public class TurnState {
+    // todo: remove players from here and into game state
     private final ImmutableList<Player> players;
     private int currentPlayerIndex;
 

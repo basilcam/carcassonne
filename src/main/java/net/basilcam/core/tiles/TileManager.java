@@ -1,6 +1,5 @@
 package net.basilcam.core.tiles;
 
-import net.basilcam.core.Board;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.HashMap;
@@ -10,30 +9,26 @@ import java.util.Optional;
 
 public class TileManager {
     private List<Tile> tiles;
+    private Tile startTile;
     protected Map<TileSection, Tile> sectionToTile;
 
-    private TileManager() {
-    }
-
-    public static TileManager create(Board board) {
-        TileManager tileManager = new TileManager();
-        tileManager.reset();
-
-        board.getTiles().values().forEach(
-                tile -> tile.getSections().forEach(
-                        tileSection -> tileManager.addTileSectionMapping(tileSection, tile)));
-
-        return tileManager;
-    }
-
-    public void reset() {
+    public TileManager() {
+        this.startTile = TileStackFactory.createStartTile();
         this.tiles = TileStackFactory.createTileStack();
         this.sectionToTile = new HashMap<>();
-        for (Tile tile : this.tiles) {
-            for (TileSection tileSection : tile.getSections()) {
-                this.sectionToTile.put(tileSection, tile);
-            }
+
+        TileManager.addTileSectionMapping(this.sectionToTile, this.startTile);
+        this.tiles.forEach(tile -> TileManager.addTileSectionMapping(this.sectionToTile, tile));
+    }
+
+    public static void addTileSectionMapping(Map<TileSection, Tile> sectionToTile, Tile tile) {
+        for (TileSection tileSection : tile.getSections()) {
+            sectionToTile.put(tileSection, tile);
         }
+    }
+
+    public Tile getStartTile() {
+        return this.startTile;
     }
 
     public Optional<Tile> drawTile() {

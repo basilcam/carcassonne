@@ -14,32 +14,24 @@ public class CarcassonneApi {
     public static final int MAX_PLAYERS = 5;
     public static final int MIN_PLAYERS = 2;
 
-    private final Board board;
-    private final List<Player> players;
     private final List<CarcassonneHandler> handlers;
+
+    private final List<Player> players;
+    private final TileManager tileManager;
+    private final Board board;
     private final CompositeFeatureManager featureManager;
 
     private GamePhase gamePhase;
     private Optional<TurnState> turnState;
-    private final TileManager tileManager;
 
     public CarcassonneApi() {
-        this.board = new Board();
-        this.players = new ArrayList<>();
         this.handlers = new ArrayList<>();
-        this.tileManager = TileManager.create(this.board);
-        this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
-        this.gamePhase = GamePhase.INVALID;
-        this.turnState = Optional.empty();
-    }
-
-    public void newGame() {
-        this.players.clear();
-        this.board.reset();
+        this.players = new ArrayList<>();
+        this.tileManager = new TileManager();
+        this.board = new Board(this.tileManager.getStartTile());
         this.gamePhase = GamePhase.SETUP;
-        this.featureManager.reset();
+        this.featureManager = new CompositeFeatureManager(this.board, this.tileManager);
         this.turnState = Optional.empty();
-        this.tileManager.reset();
     }
 
     public void register(CarcassonneHandler handler) {

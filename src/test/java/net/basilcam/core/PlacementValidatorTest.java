@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PlacementValidatorTest {
-    private Board board;
     private TestTileManager tileManager;
+    private Board board;
 
     @BeforeEach
     public void beforeEach() {
-        this.board = new Board();
-        this.tileManager = new TestTileManager(this.board);
+        this.tileManager = new TestTileManager();
+        this.board = new Board(this.tileManager.getStartTile());
     }
 
     @Test

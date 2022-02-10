@@ -26,13 +26,6 @@ public class CompositeFeatureManager implements FeatureManager {
     }
 
     @Override
-    public void reset() {
-        for (FeatureManager featureManager : featureManagers) {
-            featureManager.reset();
-        }
-    }
-
-    @Override
     public Collection<? extends Feature> getFeatures() {
         List<Feature> features = new ArrayList<>();
         for (FeatureManager featureManager : featureManagers) {

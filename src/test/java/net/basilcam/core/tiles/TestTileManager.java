@@ -1,16 +1,14 @@
 package net.basilcam.core.tiles;
 
 import com.google.common.collect.Multimap;
-import net.basilcam.core.Board;
-import org.jetbrains.annotations.TestOnly;
 
 import java.util.Optional;
 
 public class TestTileManager {
     private TileManager tileManager;
 
-    public TestTileManager(Board board) {
-        this.tileManager = TileManager.create(board);
+    public TestTileManager() {
+        this.tileManager = new TileManager();
     }
 
     public TileManager getTileManager() {
@@ -25,7 +23,10 @@ public class TestTileManager {
         return tile;
     }
 
-    @TestOnly
+    public Tile getStartTile() {
+        return this.tileManager.getStartTile();
+    }
+
     private static Tile createTileById(int id) {
         Multimap<Integer, Tile> tileMap = TileStackFactory.createTileMap();
         Optional<Tile> tile = tileMap.get(id).stream().findFirst();

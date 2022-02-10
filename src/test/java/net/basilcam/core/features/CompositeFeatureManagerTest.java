@@ -15,15 +15,15 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CompositeFeatureManagerTest {
-    private Board board;
     private TestTileManager tileManager;
+    private Board board;
     private CompositeFeatureManager featureManager;
     private Player player;
 
     @BeforeEach
     public void beforeEach() {
-        this.board = new Board();
-        this.tileManager = new TestTileManager(this.board);
+        this.tileManager = new TestTileManager();
+        this.board = new Board(this.tileManager.getStartTile());
         this.featureManager = new CompositeFeatureManager(this.board, this.tileManager.getTileManager());
         this.player = Player.createPlayer("cam");
     }

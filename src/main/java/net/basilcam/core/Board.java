@@ -4,7 +4,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import net.basilcam.core.tiles.Tile;
-import net.basilcam.core.tiles.TileStackFactory;
 
 import java.util.Optional;
 
@@ -16,9 +15,9 @@ public class Board {
     // left is -x
     // right is +x
 
-    public Board() {
+    public Board(Tile startTile) {
         this.tiles = HashBasedTable.create();
-        reset();
+        this.tiles.put(0, 0, startTile);
     }
 
     public Optional<Tile> getTile(int xPosition, int yPosition) {
@@ -52,11 +51,6 @@ public class Board {
         for (Table.Cell<Integer, Integer, Tile> cell : this.tiles.cellSet()) {
             consumer.accept(cell.getValue(), cell.getRowKey(), cell.getColumnKey());
         }
-    }
-
-    public void reset() {
-        this.tiles.clear();
-        this.tiles.put(0, 0, TileStackFactory.createStartTile());
     }
 
     public interface TileConsumer {
