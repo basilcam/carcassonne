@@ -3,9 +3,13 @@ package net.basilcam.core.api;
 import net.basilcam.core.Player;
 import net.basilcam.core.tiles.TestTileManager;
 import net.basilcam.core.tiles.Tile;
+import net.basilcam.core.tiles.TileSection;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -149,43 +153,151 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceMeeple_gameNotInPlayingPhase() {
+        api.addPlayer("cam");
+
+        Tile tile10 = tileManager.drawTileById(10);
+        TileSection tileSection = tile10.getTopSection();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.placeMeeple(tile10, tileSection));
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.PLACE_MEEPLE_WRONG_PHASE);
     }
 
     @Test
     public void shouldNotPlaceMeeple_meepleAlreadyPlacedForTurn() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        tile10.rotateClockwise();
+
+        assertThat(api.placeTile(tile10, 1, 0)).isTrue();
+
+        assertThat(api.placeMeeple(tile10, tile10.getLeftSection())).isTrue();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.placeMeeple(tile10, tile10.getRightSection()));
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.PLACE_MEEPLE_ALREADY_PLACED);
     }
 
     @Test
     public void shouldNotPlaceMeeple_tileNotJustPlaced() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        tile10.rotateClockwise();
+        assertThat(api.placeTile(tile10, 1, 0)).isTrue();
+
+        api.scoreFeatures();
+        api.nextTurn();
+
+        Tile tile15 = tileManager.drawTileById(15);
+        assertThat(api.placeTile(tile15, 2, 0)).isTrue();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.placeMeeple(tile10, tile10.getLeftSection()));
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.PLACE_MEEPLE_NO_TILE);
     }
 
     @Test
     public void shouldNotPlaceMeeple_featureAlreadyHasMeeple() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        tile10.rotateClockwise();
+        assertThat(api.placeTile(tile10, 1, 0)).isTrue();
+        assertThat(api.placeMeeple(tile10, tile10.getLeftSection())).isTrue();
+
+        api.scoreFeatures();
+        api.nextTurn();
+
+        Tile tile15 = tileManager.drawTileById(15);
+        assertThat(api.placeTile(tile15, 2, 0)).isTrue();
+
+        assertThat(api.placeMeeple(tile15, tile15.getLeftSection())).isFalse();
     }
 
     @Test
     public void shouldPlaceMeeple() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile10 = tileManager.drawTileById(10);
+        tile10.rotateClockwise();
+        assertThat(api.placeTile(tile10, 1, 0)).isTrue();
+        assertThat(api.placeMeeple(tile10, tile10.getLeftSection())).isTrue();
     }
-
-
-
 
     @Test
     public void shouldNotScoreFeatures_gameNotInPlayingPhase() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
 
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.scoreFeatures());
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.SCORE_WRONG_PHASE);
     }
 
     @Test
     public void shouldNotScoreFeatures_tileHasNotBeenPlacedThisTurn() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> api.scoreFeatures());
+        assertThat(exception.getMessage()).isEqualTo(ErrorMessages.SCORE_NO_TILE_PLACED);
     }
 
     @Test
-    public void shouldScoreFeatures() {
+    public void shouldScoreFeatures_noMeeplePlaced() {
+        api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
 
+        Tile tile20 = tileManager.drawTileById(20);
+        tile20.rotateClockwise();
+        tile20.rotateClockwise();
+        assertThat(api.placeTile(tile20, 0, 1)).isTrue();
+
+        api.scoreFeatures();
+        ArgumentCaptor<Player> captor = ArgumentCaptor.forClass(Player.class);
+        verify(this.handler, times(2)).scoreUpdate(captor.capture());
+        List<Player> players = captor.getAllValues();
+        assertPlayerScore(players, "cam", 0);
+        assertPlayerScore(players, "mina", 0);
+    }
+
+    @Test
+    public void shouldScoreFeatures_meeplePlaced() {
+        Player cam = api.addPlayer("cam");
+        api.addPlayer("mina");
+        api.startGame();
+        verify(handler).turnStarted(eq(cam));
+
+        Tile tile20 = tileManager.drawTileById(20);
+        tile20.rotateClockwise();
+        tile20.rotateClockwise();
+        assertThat(api.placeTile(tile20, 0, 1)).isTrue();
+        api.placeMeeple(tile20, tile20.getBottomSection());
+
+        api.scoreFeatures();
+        ArgumentCaptor<Player> captor = ArgumentCaptor.forClass(Player.class);
+        verify(this.handler, times(2)).scoreUpdate(captor.capture());
+        List<Player> players = captor.getAllValues();
+        assertPlayerScore(players, "cam", 4);
+        assertPlayerScore(players, "mina", 0);
+    }
+
+    private void assertPlayerScore(List<Player> players, String name, int score) {
+        assertThat(players).areExactly(1, new Condition<>(
+                player -> player.getName().equals(name) && player.getScore() == score,
+                ""));
     }
 }
