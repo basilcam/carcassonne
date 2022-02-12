@@ -1,5 +1,7 @@
 package net.basilcam.core;
 
+import net.basilcam.gui.PlayerColor;
+
 import java.util.*;
 
 public class Player {
@@ -8,15 +10,21 @@ public class Player {
     private final String name;
     private int score;
     private final Meeple[] meeples;
+    private final PlayerColor color;
 
-    public Player(String name) {
+    public Player(String name, PlayerColor color) {
         this.name = name;
         this.score = 0;
         this.meeples = Player.createMeeples();
+        this.color = color;
     }
 
     public String getName() {
         return this.name;
+    }
+
+    public PlayerColor getColor() {
+        return this.color;
     }
 
     public void addScore(int score) {

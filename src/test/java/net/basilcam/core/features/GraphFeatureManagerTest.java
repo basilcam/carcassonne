@@ -2,6 +2,7 @@ package net.basilcam.core.features;
 
 import net.basilcam.core.*;
 import net.basilcam.core.tiles.*;
+import net.basilcam.gui.PlayerColor;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,8 @@ public class GraphFeatureManagerTest {
         this.board = new Board(this.tileManager.getStartTile());
         this.featureManager = new GraphFeatureManager(this.playerManager, this.tileManager.getTileManager(), this.board);
 
-        this.player1 = new Player("cam");
-        this.playerManager.addPlayer(this.player1);
-        this.player2 = new Player("basil");
-        this.playerManager.addPlayer(this.player2);
+        this.player1 = this.playerManager.addPlayer("cam", PlayerColor.RED);
+        this.player2 = this.playerManager.addPlayer("basil", PlayerColor.YELLOW);
     }
 
     @Test

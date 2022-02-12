@@ -2,6 +2,8 @@ package net.basilcam.core;
 
 import com.google.common.collect.ImmutableList;
 import net.basilcam.core.api.CarcassonneApi;
+import net.basilcam.core.api.ErrorMessages;
+import net.basilcam.gui.PlayerColor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,11 +34,19 @@ public class PlayerManager {
         return this.players.size();
     }
 
-    public void addPlayer(Player player) {
+    public Player addPlayer(String name, PlayerColor color) {
         assert this.players.size() < CarcassonneApi.MAX_PLAYERS;
+
+        if (this.players.stream().anyMatch(player -> player.getColor() == color)) {
+            throw new IllegalStateException(ErrorMessages.ADD_PLAYER_COLOR_USED);
+        }
+
+        Player player = new Player(name, color);
 
         this.players.add(player);
         addMeepleToPlayer(player);
+
+        return player;
     }
 
     public void removePlayer(Player player) {

@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 import org.jetbrains.annotations.TestOnly;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -43,10 +45,11 @@ public enum TileStackFactory {
 
     private static JsonTileConfig.JsonTileStack readStackFromJson() {
         Gson gson = new Gson();
-        URL resource = TileStackFactory.class.getClassLoader().getResource(JsonTileConfig.TILES_FILE_NAME);
-        assert resource != null;
+
+        InputStream stream = TileStackFactory.class.getClassLoader().getResourceAsStream(JsonTileConfig.TILES_FILE_NAME);
+        assert stream != null;
         // todo: check for autocloseable
-        try (Reader reader = new InputStreamReader(new FileInputStream(resource.getFile()), StandardCharsets.UTF_8)) {
+        try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             return gson.fromJson(reader, JsonTileConfig.JsonTileStack.class);
         } catch (IOException aE) {
             aE.printStackTrace();

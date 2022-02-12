@@ -4,6 +4,7 @@ import net.basilcam.core.Player;
 import net.basilcam.core.tiles.TestTileManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileSection;
+import net.basilcam.gui.PlayerColor;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,18 +31,18 @@ class CarcassonneApiTest {
     @Test
     public void shouldNotAddPlayer_tooManyPlayers() {
         for (int i = 0; i < CarcassonneApi.MAX_PLAYERS; i++) {
-            api.addPlayer("cam" + i);
+            api.addPlayer("cam" + i, PlayerColor.values()[i]);
         }
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.addPlayer("cam"));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.addPlayer("cam", PlayerColor.BLACK));
 
         assertThat(exception.getMessage()).isEqualTo(ErrorMessages.ADD_PLAYER_TOO_MANY);
     }
 
     @Test
     public void shouldNotRemovePlayer_gameIsNotInSetupPhase() {
-        api.addPlayer("cam");
-        Player mina = api.addPlayer("mina"); // my cat's name =^._.^=
+        api.addPlayer("cam", PlayerColor.RED);
+        Player mina = api.addPlayer("mina", PlayerColor.YELLOW); // my cat's name =^._.^=
         api.startGame();
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.removePlayer(mina));
@@ -50,15 +51,15 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldRemovePlayer() {
-        api.addPlayer("cam");
-        Player mina = api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        Player mina = api.addPlayer("mina", PlayerColor.YELLOW);
 
         api.removePlayer(mina);
     }
 
     @Test
     public void shouldNotStartGame_tooFewPlayers() {
-        api.addPlayer("cam");
+        api.addPlayer("cam", PlayerColor.RED);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.startGame());
         assertThat(exception.getMessage()).isEqualTo(ErrorMessages.START_GAME_WRONG_PLAYER_COUNT);
@@ -66,15 +67,15 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldStartGame_validNumberOfPlayers() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
     }
 
     @Test
     public void shouldNotTakeTurn_gameIsNotInPlayingPhase() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> api.nextTurn());
         assertThat(exception.getMessage()).isEqualTo(ErrorMessages.NEXT_TURN_WRONG_PHASE);
@@ -82,8 +83,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldCycleThroughTurnForEachPlayer() {
-        Player cam = api.addPlayer("cam");
-        Player mina = api.addPlayer("mina");
+        Player cam = api.addPlayer("cam", PlayerColor.RED);
+        Player mina = api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         ArgumentCaptor<Player> captor = ArgumentCaptor.forClass(Player.class);
@@ -102,7 +103,7 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceTile_gameNotInPlayingPhase() {
-        api.addPlayer("cam");
+        api.addPlayer("cam", PlayerColor.RED);
 
         Tile tile10 = tileManager.drawTileById(10);
         tile10.rotateClockwise();
@@ -114,8 +115,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceTile_tileAlreadyPlacedForTurn() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -130,8 +131,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceTile_tilePlacementInvalid() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -140,8 +141,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldPlaceTile_previousPlacementInvalid_currentPlacementValid() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -153,7 +154,7 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceMeeple_gameNotInPlayingPhase() {
-        api.addPlayer("cam");
+        api.addPlayer("cam", PlayerColor.RED);
 
         Tile tile10 = tileManager.drawTileById(10);
         TileSection tileSection = tile10.getTopSection();
@@ -165,8 +166,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceMeeple_meepleAlreadyPlacedForTurn() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -183,8 +184,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceMeeple_tileNotJustPlaced() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -204,8 +205,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotPlaceMeeple_featureAlreadyHasMeeple() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -224,8 +225,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldPlaceMeeple() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -236,8 +237,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotScoreFeatures_gameNotInPlayingPhase() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> api.scoreFeatures());
@@ -246,8 +247,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldNotScoreFeatures_tileHasNotBeenPlacedThisTurn() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
@@ -257,8 +258,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldScoreFeatures_noMeeplePlaced() {
-        api.addPlayer("cam");
-        api.addPlayer("mina");
+        api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
 
         Tile tile20 = tileManager.drawTileById(20);
@@ -276,8 +277,8 @@ class CarcassonneApiTest {
 
     @Test
     public void shouldScoreFeatures_meeplePlaced() {
-        Player cam = api.addPlayer("cam");
-        api.addPlayer("mina");
+        Player cam = api.addPlayer("cam", PlayerColor.RED);
+        api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
         verify(handler).turnStarted(eq(cam));
 

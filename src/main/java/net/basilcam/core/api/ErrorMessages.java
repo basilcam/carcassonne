@@ -8,6 +8,7 @@ public enum ErrorMessages {
     public static final String ADD_PLAYER_WRONG_PHASE = API_ERROR + "can only add players in setup phase";
     public static final String ADD_PLAYER_TOO_MANY = API_ERROR + "can not add more than " + CarcassonneApi.MAX_PLAYERS
             + " players";
+    public static final String ADD_PLAYER_COLOR_USED = API_ERROR + "can not use same color twice";
 
     public static final String REMOVE_PLAYER_WRONG_PHASE = API_ERROR + "can only remove players in setup phase";
 

@@ -2,6 +2,7 @@ package net.basilcam.core.features;
 
 import net.basilcam.core.*;
 import net.basilcam.core.tiles.*;
+import net.basilcam.gui.PlayerColor;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,7 @@ class CompositeFeatureManagerTest {
         this.board = new Board(this.tileManager.getStartTile());
         this.featureManager = new CompositeFeatureManager(this.playerManager, this.tileManager.getTileManager(), this.board);
 
-        this.player = new Player("cam");
-        this.playerManager.addPlayer(this.player);
+        this.player = this.playerManager.addPlayer("cam", PlayerColor.RED);
     }
 
     @Test

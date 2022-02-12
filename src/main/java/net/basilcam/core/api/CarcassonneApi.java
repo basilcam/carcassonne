@@ -5,6 +5,7 @@ import net.basilcam.core.features.CompositeFeatureManager;
 import net.basilcam.core.tiles.Tile;
 import net.basilcam.core.tiles.TileManager;
 import net.basilcam.core.tiles.TileSection;
+import net.basilcam.gui.PlayerColor;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CarcassonneApi {
-    public static final int MAX_PLAYERS = 5;
+    public static final int MAX_PLAYERS = PlayerColor.values().length;
     public static final int MIN_PLAYERS = 2;
 
     private final List<CarcassonneHandler> handlers;
@@ -44,7 +45,7 @@ public class CarcassonneApi {
         this.handlers.add(handler);
     }
 
-    public Player addPlayer(String name) {
+    public Player addPlayer(String name, PlayerColor color) {
         if (this.gamePhase != GamePhase.SETUP) {
             throw new IllegalStateException(ErrorMessages.ADD_PLAYER_WRONG_PHASE);
         }
@@ -52,9 +53,7 @@ public class CarcassonneApi {
             throw new IllegalStateException(ErrorMessages.ADD_PLAYER_TOO_MANY);
         }
 
-        Player player = new Player(name);
-        this.playerManager.addPlayer(player);
-        return player;
+        return this.playerManager.addPlayer(name, color);
     }
 
     public void removePlayer(Player player) {
