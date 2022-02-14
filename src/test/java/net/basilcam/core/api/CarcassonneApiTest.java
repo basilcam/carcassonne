@@ -88,7 +88,7 @@ class CarcassonneApiTest {
         api.startGame();
 
         ArgumentCaptor<Player> captor = ArgumentCaptor.forClass(Player.class);
-        verify(handler).turnStarted(captor.capture());
+        verify(handler).turnStarted(captor.capture(), any());
         assertThat(captor.getValue()).isEqualTo(cam);
 
         Tile tile10 = tileManager.drawTileById(10);
@@ -97,7 +97,7 @@ class CarcassonneApiTest {
         api.scoreFeatures();
 
         api.nextTurn();
-        verify(handler, times(2)).turnStarted(captor.capture());
+        verify(handler, times(2)).turnStarted(captor.capture(), any());
         assertThat(captor.getValue()).isEqualTo(mina);
     }
 
@@ -280,7 +280,7 @@ class CarcassonneApiTest {
         Player cam = api.addPlayer("cam", PlayerColor.RED);
         api.addPlayer("mina", PlayerColor.YELLOW);
         api.startGame();
-        verify(handler).turnStarted(eq(cam));
+        verify(handler).turnStarted(eq(cam), any());
 
         Tile tile20 = tileManager.drawTileById(20);
         tile20.rotateClockwise();

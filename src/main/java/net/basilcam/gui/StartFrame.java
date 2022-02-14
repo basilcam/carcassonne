@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.ConcurrentNavigableMap;
 
 public class StartFrame extends JFrame {
     private static final String NAME = "Carcassonne - Start";

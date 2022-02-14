@@ -15,6 +15,7 @@ public class Tile {
     private TileSection rightSection;
     private final ImmutableList<TileSection> centerSections;
     private final boolean hasCoatOfArms;
+    private int clockWiseRotationCount;
 
     private Tile(int id,
                  TileSection topSection,
@@ -30,6 +31,7 @@ public class Tile {
         this.rightSection = rightSection;
         this.centerSections = centerSections;
         this.hasCoatOfArms = hasCoatOfArms;
+        this.clockWiseRotationCount = 0;
     }
 
     public int getId() {
@@ -96,6 +98,14 @@ public class Tile {
         this.bottomSection = tempRight;
         this.leftSection = tempBottom;
         this.topSection = tempLeft;
+
+        this.clockWiseRotationCount = this.clockWiseRotationCount == 3
+                ? 0
+                : this.clockWiseRotationCount + 1;
+    }
+
+    public int getClockWiseRotationCount() {
+        return this.clockWiseRotationCount;
     }
 
     public static class Builder {

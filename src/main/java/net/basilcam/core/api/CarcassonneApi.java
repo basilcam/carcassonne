@@ -73,9 +73,8 @@ public class CarcassonneApi {
         }
 
         this.gamePhase = GamePhase.PLAYING;
-        this.turnState = new TurnState();
-        this.handlers.forEach(CarcassonneHandler::gameStarted);
-        this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer()));
+        this.turnState = new TurnState(this.tileManager.drawTile());
+        this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer(), this.turnState));
     }
 
     public void nextTurn() {
@@ -94,9 +93,13 @@ public class CarcassonneApi {
             return;
         }
 
-        this.turnState = new TurnState();
+        this.turnState = new TurnState(this.tileManager.drawTile());
         this.playerManager.nextTurn();
-        this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer()));
+        this.handlers.forEach(handler -> handler.turnStarted(this.playerManager.getCurrentPlayer(), this.turnState));
+    }
+
+    public Tile getStartTile() {
+        return this.tileManager.getStartTile();
     }
 
     public boolean placeTile(Tile tile, int xPosition, int yPosition) {
@@ -106,12 +109,15 @@ public class CarcassonneApi {
         if (this.turnState.hasPlacedTile()) {
             throw new IllegalStateException(ErrorMessages.PLACE_TILE_ALREADY_PLACED);
         }
+        if (!this.turnState.getTile().equals(tile)) {
+            throw new IllegalStateException(ErrorMessages.PLACE_TILE_NOT_DRAWN_THIS_TURN);
+        }
 
         if (!PlacementValidator.isValid(this.board, xPosition, yPosition, tile)) {
             return false;
         }
 
-        this.turnState.setLastPlacedTile(tile);
+        this.turnState.placedTile();
 
         this.board.placeTile(tile, xPosition, yPosition);
 
@@ -124,7 +130,7 @@ public class CarcassonneApi {
         if (this.gamePhase != GamePhase.PLAYING) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_WRONG_PHASE);
         }
-        if (!this.turnState.hasPlacedTile() || !this.turnState.getLastPlacedTile().equals(tile)) {
+        if (!this.turnState.hasPlacedTile() || !this.turnState.getTile().equals(tile)) {
             throw new IllegalStateException(ErrorMessages.PLACE_MEEPLE_NO_TILE);
         }
         if (this.turnState.hasPlacedMeeple()) {

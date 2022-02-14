@@ -2,30 +2,29 @@ package net.basilcam.core;
 
 import net.basilcam.core.tiles.Tile;
 
-import java.util.Optional;
-
 public class TurnState {
+    private final Tile tile;
     private boolean hasPlacedMeeple;
     private boolean hasScored;
-    private Optional<Tile> lastPlacedTile;
+    private boolean hasPlacedTile;
 
-    public TurnState() {
+    public TurnState(Tile tile) {
+        this.tile = tile;
         this.hasPlacedMeeple = false;
         this.hasScored = false;
-        this.lastPlacedTile = Optional.empty();
+        this.hasPlacedTile = false;
+    }
+
+    public Tile getTile() {
+        return this.tile;
     }
 
     public boolean hasPlacedTile() {
-        return this.lastPlacedTile.isPresent();
+        return this.hasPlacedTile;
     }
 
-    public void setLastPlacedTile(Tile tile) {
-        this.lastPlacedTile = Optional.of(tile);
-    }
-
-    public Tile getLastPlacedTile() {
-        assert this.lastPlacedTile.isPresent();
-        return this.lastPlacedTile.get();
+    public void placedTile() {
+        this.hasPlacedTile = true;
     }
 
     public boolean hasPlacedMeeple() {

@@ -1,6 +1,5 @@
 package net.basilcam.gui;
 
-import net.basilcam.core.Board;
 import net.basilcam.core.api.CarcassonneApi;
 
 import javax.imageio.ImageIO;
@@ -16,6 +15,7 @@ public class SetupFrame extends JFrame {
     public static final String NAME = "Carcassonne - Setup";
     private static final String LOGO_FILENAME = "/logo_small.png";
     private Map<PlayerColor, JTextField> playerFields = new HashMap<>();
+    private ImageProvider imageProvider = new ImageProvider();
 
     SetupFrame() {
         super(NAME);
@@ -52,12 +52,21 @@ public class SetupFrame extends JFrame {
         playerPanelConstraints.insets = new Insets(20, 20, 20, 20);
         add(createPlayerFields(), playerPanelConstraints);
 
+        GridBagConstraints startButtonConstraints = new GridBagConstraints();
+        startButtonConstraints.gridx = 0;
+        startButtonConstraints.gridy = 3;
+        startButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
+        startButtonConstraints.anchor = GridBagConstraints.PAGE_END;
+        startButtonConstraints.insets = new Insets(10, 10, 10, 10);
+        add(createStartButton(), startButtonConstraints);
+
         pack();
         setVisible(true);
     }
 
     private JButton createStartButton() {
         JButton button = new JButton("start game");
+        button.setFont(new Font("Courier New", Font.PLAIN, 30));
         button.addActionListener(event -> {
             CarcassonneApi api = new CarcassonneApi();
 
@@ -68,7 +77,7 @@ public class SetupFrame extends JFrame {
             }
 
             this.dispose();
-            new BoardFrame(api);
+            new GameFrame(api);
         });
         return button;
     }
@@ -109,23 +118,14 @@ public class SetupFrame extends JFrame {
             constraints.gridx = 1;
             constraints.gridy = i;
             constraints.insets = new Insets(0, 10, 10, 0);
-            JLabel meeple = createMeepleImage(playerColor);
+            JLabel meeple = new JLabel(new ImageIcon(imageProvider.getMeepleImage(playerColor)));
             panel.add(meeple, constraints);
+
+            this.playerFields.put(playerColor, playerField);
+
             i++;
         }
 
         return panel;
-    }
-
-    private JLabel createMeepleImage(PlayerColor color) {
-        try {
-            URL stream = getClass().getResource("/" + color.name().toLowerCase() + "_meeple.png");
-            assert stream != null;
-            BufferedImage image = ImageIO.read(stream);
-            Image scaledImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-            return new JLabel(new ImageIcon(scaledImage));
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
     }
 }

@@ -31,11 +31,9 @@ public class TileManager {
         return this.startTile;
     }
 
-    public Optional<Tile> drawTile() {
-        if (this.tiles.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(this.tiles.remove(0));
+    public Tile drawTile() {
+        assert hasMoreTiles();
+        return this.tiles.remove(0);
     }
 
     public boolean hasMoreTiles() {

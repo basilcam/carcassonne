@@ -15,6 +15,9 @@ public enum ErrorMessages {
     public static final String START_GAME_WRONG_PHASE = API_ERROR + "can only start game in setup phase";
     public static final String START_GAME_WRONG_PLAYER_COUNT = API_ERROR + "can only start game with 2-5 players";
 
+    public static final String DRAW_TILE_WRONG_PHASE = API_ERROR + "can only draw game in playing phase";
+    public static final String DRAW_TILE_NO_TILES = API_ERROR + "no more tiles left";
+
     public static final String NEXT_TURN_WRONG_PHASE = API_ERROR + "can only take next turn in playing phase";
     public static final String NEXT_TURN_NO_TILE_PLACED = API_ERROR + "must place tile before taking next turn";
     public static final String NEXT_TURN_NOT_SCORED = API_ERROR
@@ -22,6 +25,7 @@ public enum ErrorMessages {
 
     public static final String PLACE_TILE_WRONG_PHASE = API_ERROR + "can only place tile in playing phase";
     public static final String PLACE_TILE_ALREADY_PLACED = API_ERROR + "can only place 1 tile per turn";
+    public static final String PLACE_TILE_NOT_DRAWN_THIS_TURN = API_ERROR + "can only place tile drawn this turn";
 
     public static final String PLACE_MEEPLE_WRONG_PHASE = API_ERROR + "can only place meeple in playing phase";
     public static final String PLACE_MEEPLE_ALREADY_PLACED = API_ERROR + "can only place 1 meeple per turn";
