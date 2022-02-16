@@ -48,14 +48,8 @@ public class CompositeFeatureManager implements FeatureManager {
             return false;
         }
 
-        for (TileSection anotherSection : tile.getSections()) {
+        for (TileSection anotherSection : tile.getSections().values()) {
             if (anotherSection.getMeeple().isPresent()) {
-                return false;
-            }
-        }
-
-        for (FeatureManager featureManager : this.featureManagers) {
-            if (!featureManager.canPlaceMeeple(tile, section)) {
                 return false;
             }
         }

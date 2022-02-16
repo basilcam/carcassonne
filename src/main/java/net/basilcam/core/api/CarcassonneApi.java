@@ -1,5 +1,6 @@
 package net.basilcam.core.api;
 
+import com.google.common.collect.ImmutableList;
 import net.basilcam.core.*;
 import net.basilcam.core.features.CompositeFeatureManager;
 import net.basilcam.core.tiles.Tile;
@@ -64,11 +65,15 @@ public class CarcassonneApi {
         this.playerManager.removePlayer(player);
     }
 
+    public ImmutableList<Player> getPlayers() {
+        return this.playerManager.getPlayers();
+    }
+
     public void startGame() {
         if (this.gamePhase != GamePhase.SETUP) {
             throw new IllegalStateException(ErrorMessages.START_GAME_WRONG_PHASE);
         }
-        if (this.playerManager.getNumberPlayers() < MIN_PLAYERS || this.playerManager.getNumberPlayers() >= MAX_PLAYERS) {
+        if (this.playerManager.getNumberPlayers() < MIN_PLAYERS || this.playerManager.getNumberPlayers() > MAX_PLAYERS) {
             throw new IllegalStateException(ErrorMessages.START_GAME_WRONG_PLAYER_COUNT);
         }
 
@@ -153,6 +158,10 @@ public class CarcassonneApi {
         tileSection.placeMeeple(meeple.get());
 
         return true;
+    }
+
+    public boolean canPlaceMeeple(Tile tile, TileSection tileSection) {
+        return this.featureManager.canPlaceMeeple(tile, tileSection);
     }
 
     public void scoreFeatures() {

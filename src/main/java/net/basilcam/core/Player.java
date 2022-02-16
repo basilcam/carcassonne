@@ -48,6 +48,10 @@ public class Player {
         return Arrays.asList(this.meeples);
     }
 
+    public long getNumberOfUnplacedMeeples() {
+        return Arrays.stream(this.meeples).filter(meeple -> !meeple.isPlaced()).count();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

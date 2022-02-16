@@ -1,11 +1,11 @@
 package net.basilcam.core.tiles;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import net.basilcam.core.Direction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class Tile {
     private final int id;
@@ -50,17 +50,16 @@ public class Tile {
                 return getRightSection();
             default:
                 throw new IllegalStateException();
-
         }
     }
 
-    public Collection<TileSection> getSections() {
-        List<TileSection> sections = new ArrayList<>();
-        sections.add(getTopSection());
-        sections.add(getLeftSection());
-        sections.add(getBottomSection());
-        sections.add(getRightSection());
-        sections.addAll(getCenterSections());
+    public Multimap<TileSectionLocation, TileSection> getSections() {
+        Multimap<TileSectionLocation, TileSection> sections = ArrayListMultimap.create();
+        sections.put(TileSectionLocation.TOP, getTopSection());
+        sections.put(TileSectionLocation.LEFT, getLeftSection());
+        sections.put(TileSectionLocation.BOTTOM, getBottomSection());
+        sections.put(TileSectionLocation.RIGHT, getRightSection());
+        getCenterSections().forEach(section -> sections.put(TileSectionLocation.CENTER, section));
         return sections;
     }
 

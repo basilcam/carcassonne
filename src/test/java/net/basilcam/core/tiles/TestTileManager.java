@@ -17,7 +17,7 @@ public class TestTileManager {
 
     public Tile drawTileById(int id) {
         Tile tile = TestTileManager.createTileById(id);
-        for (TileSection tileSection : tile.getSections()) {
+        for (TileSection tileSection : tile.getSections().values()) {
             this.tileManager.addTileSectionMapping(tileSection, tile);
         }
         return tile;

@@ -5,11 +5,10 @@ import org.jetbrains.annotations.TestOnly;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class TileManager {
-    private List<Tile> tiles;
-    private Tile startTile;
+    private final List<Tile> tiles;
+    private final Tile startTile;
     protected Map<TileSection, Tile> sectionToTile;
 
     public TileManager() {
@@ -22,7 +21,7 @@ public class TileManager {
     }
 
     public static void addTileSectionMapping(Map<TileSection, Tile> sectionToTile, Tile tile) {
-        for (TileSection tileSection : tile.getSections()) {
+        for (TileSection tileSection : tile.getSections().values()) {
             sectionToTile.put(tileSection, tile);
         }
     }

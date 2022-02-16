@@ -70,14 +70,16 @@ public class SetupFrame extends JFrame {
         button.addActionListener(event -> {
             CarcassonneApi api = new CarcassonneApi();
 
-            for (Map.Entry<PlayerColor, JTextField> playerTextField : this.playerFields.entrySet()) {
-                if (!playerTextField.getValue().getText().isEmpty()) {
-                    api.addPlayer(playerTextField.getValue().getText(), playerTextField.getKey());
+            for (PlayerColor color : PlayerColor.values()) {
+                JTextField textField = this.playerFields.get(color);
+                if (!textField.getText().isEmpty()) {
+                    api.addPlayer(textField.getText(), color);
                 }
             }
 
             this.dispose();
-            new GameFrame(api);
+            GameFrame frame = new GameFrame(api);
+            frame.centerScrollBars();
         });
         return button;
     }
